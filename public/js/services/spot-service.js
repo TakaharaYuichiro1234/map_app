@@ -9,7 +9,8 @@ function loadSpots() {
 function saveSpot(name, description, lat, lng, address, ownerId) {
     const spots = loadSpots();
 
-    const spotId = crypto.randomUUID();
+    const spotId = generateUUID();
+    // const spotId = crypto.randomUUID();
     const spot = {
         id: spotId,
         name: name,
@@ -81,4 +82,15 @@ function getSpotNumber() {
 
     if (!safeSetItem(STORAGE_SPOT_NUMBER, String(number))) return null;
     return number;
+}
+
+function generateUUID() {
+    if (window.crypto && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
 }

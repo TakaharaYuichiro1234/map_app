@@ -6,7 +6,8 @@ function loadRatings() {
 }
 
 function getRating(spotId, userId, rating, comment, createdAt) {
-    const id = crypto.randomUUID();
+    const id = generateUUID();
+    // const id = crypto.randomUUID();
     return {id, spotId, userId, rating, comment, createdAt};
 }
 

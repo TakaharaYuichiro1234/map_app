@@ -9,7 +9,8 @@ function savePhotos(spotId, base64imgs) {
     const photos = loadPhotos();
     const ids = [];
     for(const img of base64imgs) {
-        const id = crypto.randomUUID();
+        const id = generateUUID();
+        // const id = crypto.randomUUID();
         const photo = {
             id: id,
             spotId: spotId,
