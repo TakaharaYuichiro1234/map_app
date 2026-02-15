@@ -1,0 +1,241 @@
+/* 地図表示/リスト表示の切り替えボタン */
+.view-switch {
+    display: flex;
+    flex-direction: column;   
+    width: 40px;              
+    height: 40px; 
+    border-radius: 8px;
+    overflow: hidden;
+}
+.view-switch input {
+    display: none;
+}
+.view-switch label {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #eee;
+    cursor: pointer;
+    user-select: none;
+    font-size: 10px;
+    white-space: nowrap;
+}
+.view-switch input:checked ~ .top {
+    background: #0078ff;
+    color: white;
+}
+.view-switch input:checked ~ .bottom {
+    background: #ccc;
+}
+.view-switch input:not(:checked) ~ .top {
+    background: #ccc;
+}
+.view-switch input:not(:checked) ~ .bottom {
+    background: #0078ff;
+    color: white;
+}
+
+/* 地図 or リストの表示領域の初期状態(初期は地図を表示) */
+.view-area {
+    width: 100%;
+    height: calc(100dvh - 70px);
+    position: relative;
+}
+#view-map {
+    display: block;
+}
+#view-list {
+    display: none;
+    overflow-y: scroll; 
+}
+
+/* 地図表示領域の設定 */
+#map { 
+    width: 100%; 
+    height: 100%; 
+    position: absolute;
+    top: 0; 
+    left: 0;
+}
+
+#overlay-canvas {
+    width: 100%; 
+    height: 100%; 
+    position: absolute;
+    top: 0; 
+    left: 0;
+    pointer-events: none; 
+    z-index: 999;
+}
+
+.item-label {
+    display: block; 
+    margin-top: 12px; 
+    font-weight: bold; 
+}
+
+.new-btn {
+    position: absolute;
+    bottom: 40px;
+    left: 20px;
+    height: 48px;
+    width: 60px;
+    background: #0078ff;
+    color: white;
+    border: 0px solid;
+    border-radius: 45%;
+    font-size: large; 
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+#to-current-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 1000;
+    padding: 0.4em 0.5em 0.4em 1.8em;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    font-size: 18px;
+    color: #007AFF;
+    white-space: nowrap;
+}
+
+#to-current-btn::before {
+    content: "";
+    position: absolute;
+    left: 0.5em;
+    top: 50%;
+    width: 0.6em;
+    height: 0.6em;
+    background-color: #EEE;
+    border: 0.2em solid #007AFF;
+    border-radius: 50%;
+    transform: translateY(-50%);
+}
+
+.map-message{
+    position: relative;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);  
+    width: 70%;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 4vmin;
+    z-index: 1000;
+    display: none;
+}
+.cancel-btn {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: -16px;
+    right: 6px;
+    background: gray;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+}
+
+#center-cross{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 32px;
+    color: red;
+    z-index: 1000;
+    display: none;
+    pointer-events: none;
+}
+
+.user-location {
+    animation: pulse 2s infinite;
+    transform-origin: center;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    70% {
+        opacity: 0.4;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* リスト表示領域の設定 */
+.list-button-container {
+    display: flex;
+    gap: 5px;
+}
+.list-button-container button {
+    border-radius: 5px;
+    border: 1px solid #999;
+    min-height: 35px;
+}
+
+.list-content {
+    display: flex;
+    width: 100%;
+    gap: 5px;
+    align-items: center;
+    padding: 5px 0 0;
+    border-bottom: 1px solid gray;
+}
+.list-content-image {
+    width: 30%;
+    max-width: 100px;
+    flex-shrink: 0;
+    margin: 0;
+}
+.list-content-image img{
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    margin: 0;
+}
+.list-content-info {
+    flex: 1;
+    min-width: 0;
+    margin-bottom: 5px;
+}
+
+.list-content-info--name {
+    font-weight: 550;
+    margin: 0 0 3px 0;
+    word-break: break-word;
+}
+.list-content-info--data {
+    margin: 0 0 2px 0;
+    font-size: small;
+}
+.list-content-button-container {
+    display: flex;
+    gap: 5px;
+}
+.list-content-info--detail-button {
+    margin: 0;
+    font-size: small;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 3px;
+    background-color: #F0F0F0;
+    color: #333;
+}

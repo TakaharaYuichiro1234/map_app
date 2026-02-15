@@ -1,0 +1,374 @@
+/* 
+******************************************
+各画面の共通のスタイル設定ファイル 
+******************************************
+*/
+
+* {
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #eeeeee;
+}
+
+html { 
+    margin: 0; 
+    height: 100%; 
+}
+
+body {
+    font-family: sans-serif; 
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+main {
+    margin: 0 auto;
+    padding: 5px 10px;
+    position: relative;
+}
+
+/* ヘッダーの共通レイアウト */
+header {
+    width: 100%;
+    height: 50px;
+    padding: 0;
+    display: grid;
+    align-items: center;
+}
+
+.header-full { grid-template-columns: 30px 1fr 70px 40px; }
+.header-type1 { grid-template-columns: 1fr 50px 40px; }
+.header-type2 { grid-template-columns: 30px 1fr 40px; }
+.header-type3 { grid-template-columns: 30px 1fr; }
+.header-type4 { grid-template-columns: 30px 1fr 70px; }
+.header-dialog { grid-template-columns: 30px 1fr 70px; }
+
+/* ヘッダーに記載されるタイトルの文字列 */
+.header-title {
+    margin-left: 10px;
+    font-size: large;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow:hidden;
+}
+
+/* 戻るボタン */
+.prev-button {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+.prev-button .lessthan{
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-decoration: none;
+}
+.prev-button .lessthan::before{
+    content: "";
+    display: block;
+    width: 15px;
+    height: 15px;
+    border-top: #333 2px solid;
+    border-left: #333 2px solid;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(-45deg);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 15px;
+    margin: auto;
+}
+
+/* ヘッダー用のボタンのデザイン */
+.header-button {
+    margin-right: 5px;
+    height: 48px;
+    background: #0078ff;
+    color: white;
+    border: 0px solid;
+    border-radius: 6px;
+    font-size: large; 
+    white-space: nowrap;
+}
+
+.header-button a { 
+    font-size: large; 
+    color: white; 
+    text-decoration: none; 
+}
+
+/* 3点リーダ (メニューボタン) */
+.three-dot-leader {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background: none;
+    display: block;
+    position: relative;
+    border: none;
+}
+
+.three-dot-leader .dot,
+.three-dot-leader .dot::before,
+.three-dot-leader .dot::after {
+    display: block;
+    position: absolute;
+    border-radius: 50%;
+    width: 4px;
+    height: 4px;
+    background-color: #333;
+}
+.three-dot-leader .dot {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+}
+
+.three-dot-leader .dot::before, .three-dot-leader .dot::after {
+    content: '';
+}
+
+.three-dot-leader .dot::before {
+    top: -9px;    /* 上のドットの位置 */
+}
+
+.three-dot-leader .dot::after {
+    top: 9px;     /* 下のドットの位置 */
+}
+
+/* 3点リーダを押した時に表示されるメニューパネル */
+.menu-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 9999;
+    min-width: 160px;
+}
+
+.menu-panel.show {
+    display: block;
+}
+
+.menu-item {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+.menu-item:hover {
+    background-color: #f3f3f3;
+    cursor: pointer;
+}
+
+/* 標準のボタンのデザイン */
+.primary-button {
+    padding: 0 20px;
+    margin: 5px;
+    height: 48px;
+    background: #0078ff;
+    color: white;
+    border: 0px solid;
+    border-radius: 6px;
+    font-size: large; 
+    white-space: nowrap;
+}
+
+.primary-button:disabled {
+    background: #ddd;
+    color:#f0f0f0;
+}
+
+/* 基本情報のテキストのデザイン */
+.info-caption {
+    margin: 5px 0 0 0;
+    font-size: small;
+    color: #666;
+}
+.info-data {
+    margin: 0 0 10px 2px;
+    width: calc(100% - 5px);
+    max-width: 600px;
+    padding: 4px 2px;
+    background: #F8FCFC;
+    white-space: pre-wrap;
+}
+.info-data.changed {
+    background: #ffe8e8e8;
+}
+.info-data-textarea {
+    height: 60px;
+    resize: vertical;
+}
+.info-data-textarea.changed {
+    background: #ffe8e8e8;
+}
+
+/* 写真表示エリア */
+#photo-preview-area {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+#photo-preview-area img {
+    flex-shrink: 0;
+    margin: 3px;
+    object-fit: contain;
+}
+
+/* ページトップへ戻るボタン */
+.page-top {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    right: 20px;
+    bottom: 20px;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    border: 0;
+    background: none;
+    transition: .2s;
+    letter-spacing: 3px;
+    z-index: 2000;
+}
+
+.page-top span:before {
+    position: absolute;
+    top: -29px;
+    left: 16px;
+    transform: rotate(-45deg);
+    display: block;
+    width: 12px;
+    height: 12px;
+    content: "";
+    border: 1px solid #000;
+    border-width: 1px 1px 0px 0px;
+}
+
+.page-top span:after {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border: 1px solid #000;
+    content: "";
+    border-radius: 100%;
+    top: -43px;
+    left: 5px;
+}
+
+.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* モーダル画面 */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+}
+
+.modal-content {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90%;
+    background: white;
+}
+
+.modal-content img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+}
+
+.modal-button-container {
+    position: absolute;
+    width: 100%;
+    padding: 5px;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+.modal-button-container button{
+    height: 48px;
+    border: none;
+    border-radius: 8px;
+    padding: 0 10px;
+}
+
+.modal-text {
+    padding: 10px;
+}
+.modal-text a {
+    color: blue;
+    text-decoration: underline;
+}
+
+.modal-content-inner {
+    overflow-y: scroll;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 50px;
+}
+
+.modal-close {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 32px;
+    height: 32px;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+}
+.modal-close::before, .modal-close::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 2px;
+    background-color: #333;
+    transform-origin: center;
+}
+.modal-close::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.modal-close::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
