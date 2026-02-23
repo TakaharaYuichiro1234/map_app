@@ -3,7 +3,7 @@ function back() {
 }
 
 async function remove() {
-    const spot = await getSpotById();
+    const spot = await getSpotById(id);
     const result = window.confirm(`このスポット「${spot.name}」を削除してもよろしいですか？\nスポットを削除すると写真や評価データも削除されます。`);
     if (result) {
 
@@ -11,7 +11,7 @@ async function remove() {
             .querySelector('meta[name="csrf-token"]')
             ?.getAttribute('content');
 
-        const resp = await removeSpot(csrfToken, spotId);
+        const resp = await removeSpot(csrfToken, id);
         if (resp) {
             alert(`スポット「${spot.name}」を削除しました。`);
             window.location.href = `${BASE_PATH}`;
