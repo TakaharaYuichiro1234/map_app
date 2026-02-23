@@ -14,7 +14,7 @@ venv/
 
 # uploads / runtime
 /storage/
-
+/public/uploads
 
 # db
 config/db.ph
