@@ -1,11 +1,16 @@
 class ListModule {
     constructor() {
-        this.listDom =  document.getElementById("list");
+        this.listDom = document.getElementById("list");
+        this.spots = [];
     }
 
     // -----------------------------
     // パブリックメソッド
     // -----------------------------
+    setSpotData(spots) {
+        this.spots = spots;
+    }
+
     init() {
         this.showList();
     }
@@ -33,7 +38,7 @@ class ListModule {
 
         // スポットデータをリストで表示
         let counter = 0;
-        for(const s of spots) {
+        for (const s of spots) {
             if (isOnlyNear && s.distance > NEAR_DISTANCE) continue;
             counter++;
             this.createListContent(s);
@@ -47,7 +52,8 @@ class ListModule {
     }
 
     getSpots(isOnlyNear, currentPosition) {
-        let spots = loadSpots();
+        // let spots = this.spots;
+        let spots = this.spots.map(s => ({ ...s }));     // ディープコピー
 
         // 「近くのスポット」が選択されていた場合、スポットデータに距離を追加
         if (isOnlyNear) {
@@ -71,37 +77,80 @@ class ListModule {
                 if (b.distance == null) return -1;
                 return a.distance - b.distance;
             });
-        } 
+        }
 
         return spots;
     }
 
-    createListContent(s) {
+    async createListContent(s) {
         const distText = s.distance ? `距離：約${s.distance.toFixed(1)}km` : "";
-        const avgText = `危険度：${s.recentRating !== 0 ? s.recentRating : "未評価"}`;
 
-        const photos = getPhotosBySpotId(s.id);
-        const photoData = photos.length > 0 ? photos[0].photoData : null;
-        const imgHtml = `<img src=${photoData ?? "resources/img/noimage.png"}>`;
+        const stats = await getSpotRatingStats(s.id);
+        const recentRating = stats.recentRating;
+        const avgText = `危険度：${recentRating !== 0 ? recentRating : "未評価"}`;
 
+        const photo = await getMainPhoto(s.id);
+        const path = photo
+            ? `${BASE_PATH}/uploads/${photo.spotId}/${photo.filename}`
+            : `${BASE_PATH}/resources/img/noimage.png`;
+
+        // ===== 画像 =====
+        const img = document.createElement("img");
+        img.src = path;
+
+        img.onerror = function () {
+            this.onerror = null; // 無限ループ防止
+            this.src = `${BASE_PATH}/resources/img/noimage.png`;
+        };
+
+        const imageDiv = document.createElement("div");
+        imageDiv.className = "list-content-image";
+        imageDiv.appendChild(img);
+
+        // ===== 情報部分 =====
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "list-content-info";
+
+        const nameP = document.createElement("p");
+        nameP.className = "list-content-info--name";
+        nameP.textContent = s.name ?? "";
+
+        const avgP = document.createElement("p");
+        avgP.className = "list-content-info--data";
+        avgP.textContent = avgText;
+
+        const addressP = document.createElement("p");
+        addressP.className = "list-content-info--data";
+        addressP.textContent = s.address ?? "";
+
+        const distP = document.createElement("p");
+        distP.className = "list-content-info--data";
+        distP.textContent = distText;
+
+        infoDiv.appendChild(nameP);
+        infoDiv.appendChild(avgP);
+        infoDiv.appendChild(addressP);
+        infoDiv.appendChild(distP);
+
+        // ===== ボタン =====
         const toMapButton = document.createElement("button");
         toMapButton.className = "list-content-info--detail-button";
-        toMapButton.innerHTML = "地図へ移動";
-        toMapButton.addEventListener('click', (e)=>{
+        toMapButton.textContent = "地図へ移動";
+        toMapButton.addEventListener("click", (e) => {
             e.stopPropagation();
-            document.dispatchEvent(new CustomEvent('change-view-to-map', {
+            document.dispatchEvent(new CustomEvent("change-view-to-map", {
                 detail: { id: s.id }
-            }))
+            }));
         });
 
         const openDetailButton = document.createElement("button");
         openDetailButton.className = "list-content-info--detail-button";
-        openDetailButton.innerHTML = "詳細を見る";
-        openDetailButton.addEventListener('click', (e)=>{
+        openDetailButton.textContent = "詳細を見る";
+        openDetailButton.addEventListener("click", (e) => {
             e.stopPropagation();
-            document.dispatchEvent(new CustomEvent('open-detail', {
+            document.dispatchEvent(new CustomEvent("open-detail", {
                 detail: { id: s.id }
-            }))
+            }));
         });
 
         const buttonContainer = document.createElement("div");
@@ -109,27 +158,25 @@ class ListModule {
         buttonContainer.appendChild(toMapButton);
         buttonContainer.appendChild(openDetailButton);
 
+        infoDiv.appendChild(buttonContainer);
+
+        // ===== 全体 =====
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "list-content";
+        contentDiv.appendChild(imageDiv);
+        contentDiv.appendChild(infoDiv);
+
         const div = document.createElement("div");
         div.className = "spotItem";
-        div.innerHTML = `
-            <div class="list-content">
-                <div class="list-content-image">${imgHtml}</div>
-                <div class="list-content-info">
-                    <p class="list-content-info--name">${s.name}</p>
-                    <p class="list-content-info--data">${avgText}</p>
-                    <p class="list-content-info--data">${s.address?? ""}</p>
-                    <p class="list-content-info--data">${distText}</p>
-                </div>
-            </div>
-        `;
+        div.appendChild(contentDiv);
 
-        div.querySelector(".list-content-info").appendChild(buttonContainer);
-        this.listDom.appendChild(div);
-
-        div.addEventListener('click', (e)=>{
-            document.dispatchEvent(new CustomEvent('open-detail', {
+        div.addEventListener("click", () => {
+            document.dispatchEvent(new CustomEvent("open-detail", {
                 detail: { id: s.id }
-            }))
+            }));
         });
+
+        this.listDom.appendChild(div);
     }
+
 };

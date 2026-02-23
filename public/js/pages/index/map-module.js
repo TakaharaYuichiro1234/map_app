@@ -13,6 +13,10 @@ class MapModule {
         this.canvas = null;
         this.ctx = null;
         this.spots = [];
+
+        this.ratingStats = [];
+
+
         this.barHitAreas = [];
         this.activePopup = null;
 
@@ -30,11 +34,24 @@ class MapModule {
     // -----------------------------
     // パブリックメソッド
     // -----------------------------
+
+    setSpotData(spots, ratingStats) {
+        this.spots = spots;
+        this.ratingStats = ratingStats;
+    }
+
+    setHighlight(id) {
+        if (id) {
+            this.highlightSpotId = id;
+            this.highlightStartTime = performance.now();
+            this.moveToHilightSpotFlag = true;
+        }
+    }
+
     init() {
-        this.getHighlightFromUrl();
         this.initMap();
         this.initCanvasLayer();
-        this.moveToHilightSpot(); 
+        this.moveToHilightSpot();
     }
 
     getLatestCurrentPosition() {
@@ -54,7 +71,6 @@ class MapModule {
     }
 
     refreshMap() {
-        this.loadSpotData();
         this.drawBars();
     }
 
@@ -86,7 +102,6 @@ class MapModule {
 
     initCanvasLayer() {
         this.initCanvas();
-        this.loadSpotData();
         this.animateBars();
     }
 
@@ -126,7 +141,7 @@ class MapModule {
     }
 
     setupLocation() {
-        this.map.locate({watch:true, setView:false, enableHighAccuracy:true});
+        this.map.locate({ watch: true, setView: false, enableHighAccuracy: true });
     }
 
     setupMapEvents() {
@@ -143,7 +158,7 @@ class MapModule {
 
     moveToHilightSpot() {
         if (this.highlightSpotId) {
-            const spot = getSpotById(this.highlightSpotId);
+            const spot = this.spots.find(s => s.id === this.highlightSpotId);
             if (spot) {
                 const latlng = L.latLng(spot.lat, spot.lng);
                 if (!this.map.getBounds().contains(latlng)) {
@@ -159,7 +174,7 @@ class MapModule {
     // -----------------------------
     // マップ関連コールバック関数
     // -----------------------------
-    onLocationFound(e) {               
+    onLocationFound(e) {
         const offsetLat = IS_DEBUG ? OFFSET_LAT : 0.0;
         const offsetLng = IS_DEBUG ? OFFSET_LNG : 0.0;
 
@@ -187,7 +202,7 @@ class MapModule {
         // ポップアップのクリック判定 (クリックしたら詳細画面へ遷移)
         if (this.activePopup) {
             const q = this.map.latLngToContainerPoint([this.activePopup.lat, this.activePopup.lng]);
-            const boxX = q.x - 20; 
+            const boxX = q.x - 20;
             const boxY = q.y + 10;
 
             if (x >= boxX && x <= boxX + this.activePopup.width &&
@@ -229,19 +244,19 @@ class MapModule {
         this.ctx = this.canvas.getContext("2d");
     }
 
-    loadSpotData() {
-        this.spots = loadSpots();
-    }
+    // loadSpotData() {
+    //     this.spots = loadSpots();
+    // }
 
-    getHighlightFromUrl() {
-        const params = new URLSearchParams(location.search);
-        const id = params.get("highlight");
-        if (id) {
-            this.highlightSpotId = id;
-            this.highlightStartTime = performance.now();
-            this.moveToHilightSpotFlag = true;
-        }
-    }
+    // getHighlightFromUrl() {
+    //     const params = new URLSearchParams(location.search);
+    //     const id = params.get("highlight");
+    //     if (id) {
+    //         this.highlightSpotId = id;
+    //         this.highlightStartTime = performance.now();
+    //         this.moveToHilightSpotFlag = true;
+    //     }
+    // }
 
     // -----------------------------
     // 3D棒グラフ描画
@@ -257,9 +272,9 @@ class MapModule {
         const h = levelH * UNIT_H;
         const wB = levelA * UNIT_A;
 
-        const sB = K_S * wB;    
-        const uB = K_U * wB;    
-        const dB = K_D * wB;    
+        const sB = K_S * wB;
+        const uB = K_U * wB;
+        const dB = K_D * wB;
 
         const wT = (1 + (K_T - 1.0) * levelH) * wB;
         const sT = K_S * wT;
@@ -267,7 +282,7 @@ class MapModule {
         const dT = K_D * wT;
 
         // 底面の4隅の点(xBi,yBi) (左下を基準に右回りにi=0,1,2,3)
-        const xB0 = p0.x - wB/2;
+        const xB0 = p0.x - wB / 2;
         const yB0 = p0.y;
         const xB1 = xB0 + sB;
         const yB1 = yB0 - dB;
@@ -277,7 +292,7 @@ class MapModule {
         const yB3 = yB0;
 
         // 上面の4隅の点(xTi,yTi) (左下を基準に右回りにi=0,1,2,3)
-        const xT0 = p0.x - wT/2;
+        const xT0 = p0.x - wT / 2;
         const yT0 = p0.y - h;
         const xT1 = xT0 + sT;
         const yT1 = yT0 - dT;
@@ -286,10 +301,10 @@ class MapModule {
         const xT3 = xT0 + wT;
         const yT3 = yT0;
 
-        const basePoints = [{x:xB0, y:yB0}, {x:xB1, y:yB1}, {x:xB2, y:yB2}, {x:xB3, y:yB3}];
-        const topPoints = [{x:xT0, y:yT0}, {x:xT1, y:yT1}, {x:xT2, y:yT2}, {x:xT3, y:yT3}];
-        const hitPoints = [{x:xT0, y:yB0}, {x:xT0, y:yT1}, {x:xT2, y:yT2}, {x:xT2, y:yT3}];
-        return {basePoints, topPoints, hitPoints};
+        const basePoints = [{ x: xB0, y: yB0 }, { x: xB1, y: yB1 }, { x: xB2, y: yB2 }, { x: xB3, y: yB3 }];
+        const topPoints = [{ x: xT0, y: yT0 }, { x: xT1, y: yT1 }, { x: xT2, y: yT2 }, { x: xT3, y: yT3 }];
+        const hitPoints = [{ x: xT0, y: yB0 }, { x: xT0, y: yT1 }, { x: xT2, y: yT2 }, { x: xT2, y: yT3 }];
+        return { basePoints, topPoints, hitPoints };
     }
 
     isHighlighting(spotId) {
@@ -316,7 +331,7 @@ class MapModule {
         }
 
         // 伸縮の変化量
-        const expansionRate = isExpansionBar ? (this.animationProgress): 1;
+        const expansionRate = isExpansionBar ? (this.animationProgress) : 1;
 
         // 点滅の変化量
         const blink = isHighlight
@@ -334,45 +349,58 @@ class MapModule {
         };
 
         return [
-            barColor(BASE_LUMI[rated]["front"]), 
-            barColor(BASE_LUMI[rated]["top"]), 
+            barColor(BASE_LUMI[rated]["front"]),
+            barColor(BASE_LUMI[rated]["top"]),
             barColor(BASE_LUMI[rated]["side"])
         ];
-    } 
+    }
 
     drawBars() {
-        this.canvas.width  = this.map.getSize().x;
+        this.canvas.width = this.map.getSize().x;
         this.canvas.height = this.map.getSize().y;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.barHitAreas.length = 0;
 
         this.spots.forEach(spot => {
-            const latestRating = spot.recentRating;
-            const pastRating   = spot.pastRating;
-            const users        = Math.min(5, spot.totalUsers);
+            const index = this.ratingStats.findIndex(r => r.spotId === spot.id);
+            let latestRating = 1;
+            let pastRating = 1;
+            let users = 1;
+            let isRated = false;
+            if (index >= 0) {
+                latestRating = this.ratingStats[index].recentRating;
+                pastRating = this.ratingStats[index].pastRating;
+                users = Math.min(5, this.ratingStats[index].totalUsers);
+                isRated = this.ratingStats[index].isRated;
+            }
 
             const p = this.map.latLngToContainerPoint([spot.lat, spot.lng]);
 
+
             // バーの高さレベル(1〜5)
-            const maxH  = latestRating > 0 ? latestRating : 1;
-            const minH  = pastRating   > 0 ? pastRating : 1;
+            const maxH = latestRating > 0 ? latestRating : 1;
+            const minH = pastRating > 0 ? pastRating : 1;
             const levelH = (maxH - minH) * this.animationProgress + minH;
 
+
+
             // バーの底面サイズレベル(1〜2: ユーザー数1のとき1、5のとき2)
-            const levelA = Math.max(1.0, Math.min(2.0, 1.0 + (users-1)/4));
+            const levelA = Math.max(1.0, Math.min(2.0, 1.0 + (users - 1) / 4));
+
+
 
             // 遠近投影計算
-            const {basePoints, topPoints, hitPoints} = this.projectBox(levelH, levelA, p);
+            const { basePoints, topPoints, hitPoints } = this.projectBox(levelH, levelA, p);
 
             // バーの色
             const isExpansionBar = (maxH != minH);
             const isHighlight = this.isHighlighting(spot.id);
 
-            const rated = latestRating > 0 ? "rated": "notRated";
+            const rated = latestRating > 0 ? "rated" : "notRated";
             const barColor = this.getBarColor(rated, isHighlight, isExpansionBar);
             const frontColor = barColor[0];
-            const topColor   = barColor[1];
-            const sideColor  = barColor[2];
+            const topColor = barColor[1];
+            const sideColor = barColor[2];
 
             this.ctx.strokeStyle = latestRating > 0 ? "#FFFFFFE0" : "#666666";
 
@@ -410,10 +438,10 @@ class MapModule {
             this.ctx.stroke();
 
             // チェックマーク
-            if (isRated(spot.id, getCurrentUser().id, new Date())) {
+            if (isRated) {
                 this.drawCheckMark(
                     basePoints[3].x,
-                    basePoints[3].y -6
+                    basePoints[3].y - 6
                 );
             }
 
@@ -482,16 +510,16 @@ class MapModule {
 
         // ポップアップの基準点
         const p = this.map.latLngToContainerPoint([this.activePopup.lat, this.activePopup.lng]);
-        const boxX = p.x - 20; 
+        const boxX = p.x - 20;
         const boxY = p.y + 10;
 
         this.ctx.save();
-        
+
         // スポット名のテキスト(サイズ取得のため先に設定)
         const text = this.activePopup.spotName;
         this.ctx.font = "14px sans-serif";
         const metrics = this.ctx.measureText(text);
-        const textWidth = metrics.width; 
+        const textWidth = metrics.width;
 
         // 棒グラフを指す三角印
         const arrowTipWidth = 8;
@@ -501,8 +529,8 @@ class MapModule {
         this.ctx.lineWidth = 1;
         this.ctx.beginPath();
         this.ctx.moveTo(p.x, p.y);
-        this.ctx.lineTo(boxX + arrowTipOffset - arrowTipWidth/2, boxY+2);
-        this.ctx.lineTo(boxX + arrowTipOffset + arrowTipWidth/2, boxY+2);
+        this.ctx.lineTo(boxX + arrowTipOffset - arrowTipWidth / 2, boxY + 2);
+        this.ctx.lineTo(boxX + arrowTipOffset + arrowTipWidth / 2, boxY + 2);
         this.ctx.closePath();
         this.ctx.fill();
         this.ctx.stroke();
@@ -523,7 +551,7 @@ class MapModule {
         this.ctx.strokeStyle = "blue";
         this.ctx.beginPath();
         this.ctx.moveTo(boxX + 10, boxY + 22);
-        this.ctx.lineTo(boxX + 10 + textWidth , boxY + 22);
+        this.ctx.lineTo(boxX + 10 + textWidth, boxY + 22);
         this.ctx.fill();
         this.ctx.stroke();
 
@@ -537,11 +565,11 @@ class MapModule {
         this.activePopup = {
             spotId: spotId,
             lat: lat,
-            lng: lng, 
+            lng: lng,
             spotName: spotName,
             width: 150,
             height: 30
         };
-        this.drawBars(); 
+        this.drawBars();
     }
 }

@@ -1,23 +1,28 @@
-function back(spotId) {
-    location.href = `index.html?highlight=${spotId}`;
+function back() {
+    location.href = `${BASE_PATH}/spots?highlight=${id}`;
 }
 
-function remove(spotId) {
-    const spot = getSpotById(spotId);
+async function remove() {
+    const spot = await getSpotById();
     const result = window.confirm(`このスポット「${spot.name}」を削除してもよろしいですか？\nスポットを削除すると写真や評価データも削除されます。`);
     if (result) {
-        const resp = removeSpot(spotId);
+
+        const csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute('content');
+
+        const resp = await removeSpot(csrfToken, spotId);
         if (resp) {
             alert(`スポット「${spot.name}」を削除しました。`);
-            window.location.href = "index.html";
+            window.location.href = `${BASE_PATH}`;
         } else {
             alert("このスポットの削除に失敗しました。");
         }
     }
 }
 
-function submitRating(spotId) {
-    const spot = getSpotById(spotId);
+async function submitRating() {
+    const spot = getSpotById(id);
     let distance = null;
     if (mCurrentPositionStatus.position) {
         distance = MathModule.distance(
@@ -26,7 +31,7 @@ function submitRating(spotId) {
             spot.lat,
             spot.lng
         );
-    } 
+    }
 
     if (!distance) {
         if (!confirm('現在地が取得できないため、このスポットが近くにない可能性があります。このまま、このスポットの評価を登録しますか？')) return;
@@ -37,32 +42,25 @@ function submitRating(spotId) {
         if (!confirm('評価を登録してよろしいですか？')) return;
     }
 
-    const userId = getCurrentUser().id;
-    const createdAt = new Date();
-    
+    const uuid = user['uuid'];
+    const date = formatDate(new Date());
+
     // 評価済みかどうかチェック。評価済みなら保存しない
-    if (isRated(spotId, userId, createdAt)) return false;
+    if (await isRated(id, uuid, date)) return false;
 
     // 評価を保存
     const rating = Number(document.querySelector('input[name="rating"]:checked')?.value ?? 0);
     const comment = document.getElementById('rating-comment').value;
-    if (!saveRating(spotId, userId, rating, comment, createdAt)) {
+
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute('content');
+
+    const ret = await saveRating(csrfToken, id, date, rating, comment);
+    if (!ret) {
         alert("評価の登録に失敗しました。");
         return;
-    } 
+    }
 
-    // spotオブジェクトも更新
-    const stats = getSpotRatingStats(spotId);
-    const updatingSpotData = {
-        totalUsers: stats.totalUsers,
-        recentRating: stats.recentRating,
-        pastRating: stats.pastRating
-    }
-    if (!updateSpot(spotId, updatingSpotData)) {
-        return;
-    } else {
-        alert("評価を登録しました。");
-    }
-    
-    location.href = `index.html?highlight=${spotId}`;
+    location.href = `${BASE_PATH}/spots?highlight=${id}`;
 }

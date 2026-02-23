@@ -32,6 +32,14 @@ function formatDateTime(date) {
     return `${y}-${m}-${d} ${h}:${min}:${s}`;
 }
 
+function formatDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+
+    return `${y}-${m}-${d}`;
+}
+
 // 同一の日付かどうかの判定
 function isSameDay(date1, date2) {
     return (

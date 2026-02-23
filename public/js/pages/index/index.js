@@ -7,9 +7,9 @@
 // -----------------------------
 let mapInstance;
 let listInstance;
-let isSelectMode = false;  
+let isSelectMode = false;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     init();
     buttonListener();
     creatingNewSpotListener();
@@ -19,7 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // 詳細画面を開くためのカスタムイベント
 document.addEventListener("open-detail", (e) => {
     const { id } = e.detail;
-    window.location.href = `detail.html?id=${id}`;
+    window.location.href = `${BASE_PATH}/spots/${id}`;
+
 });
 
 // リスト画面から地図の危険スポットをハイライトするためのカスタムイベント
@@ -28,30 +29,47 @@ document.addEventListener("change-view-to-map", (e) => {
 
     document.getElementById("view-switch-check").checked = true;
     document.getElementById("view-map").style.display = "block";
-    document.getElementById("view-list").style.display = "none" ;
-    isSelectMode = false;  
+    document.getElementById("view-list").style.display = "none";
+    isSelectMode = false;
     mapInstance.highlightSpot(id);
 });
 
 // -----------------------------
 // 初期設定用の関数
 // -----------------------------
-function init() {
+async function init() {
     if (!localStorage.getItem(STORAGE_IS_NOT_FIRST_START)) {
         openModal();
         safeSetItem(STORAGE_IS_NOT_FIRST_START, true);
     };
 
+    const spots = await loadSpots();
+    const spotIds = spots.map(spot => spot.id);
+    const ratingStats = [];
+    for (const spotId of spotIds) {
+        let stats = await getSpotRatingStats(spotId);
+        const isRated0 = user ? await isRated(spotId, user['uuid'], formatDate(new Date())) : false;
+        stats['isRated'] = isRated0;
+        stats['spotId'] = spotId;
+        ratingStats.push(stats);
+    }
+
+    const params = new URLSearchParams(location.search);
+    const highlightSpotId = parseInt(params.get("highlight"));
+
     if (!mapInstance) {
         mapInstance = new MapModule();
+        mapInstance.setSpotData(spots, ratingStats);
+        mapInstance.setHighlight(highlightSpotId);
         mapInstance.init();
     }
     if (!listInstance) {
         listInstance = new ListModule();
+        listInstance.setSpotData(spots);
         listInstance.init();
     }
 
-    document.getElementById("btn-list-near").innerHTML = `近くのスポット(${NEAR_DISTANCE}km以内)`;   
+    document.getElementById("btn-list-near").innerHTML = `近くのスポット(${NEAR_DISTANCE}km以内)`;
 }
 
 function buttonListener() {
@@ -89,10 +107,12 @@ function creatingNewSpotListener() {
     const msg = document.getElementById("map-message");
     const cross = document.getElementById("center-cross");
 
+    newBtn.classList.toggle("hidden", !user);
+
     newBtn.addEventListener("click", (e) => {
         if (!isSelectMode) {
             // newButtonが「新規」のとき
-            e.preventDefault(); 
+            e.preventDefault();
 
             isSelectMode = true;
             newBtn.textContent = "決定";
@@ -110,12 +130,12 @@ function creatingNewSpotListener() {
             const zoom = mapInstance.getMapZoom();
             saveMapCenterZoom(center.lat, center.lng, zoom);
             saveNewSpotPos(center.lat, center.lng);
-            
+
             // 前回の新規登録の時一時保存した写真が残っている可能性があるため削除しておく
-            localStorage.removeItem("tempPhotos");  
+            localStorage.removeItem("tempPhotos");
 
             // 新規登録画面に遷移
-            window.location.href = "new.html";
+            window.location.href = `${BASE_PATH}/spots/create`;
         }
     });
 

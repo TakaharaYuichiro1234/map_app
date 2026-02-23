@@ -1,10 +1,8 @@
+const BASE_PATH = '/map_app';
+
 // *****************************
 // ローカルストレージのkey
 // *****************************
-const STORAGE_SPOTS = "spots";
-const STORAGE_RATINGS = "ratings";
-const STORAGE_PHOTOS = "photos";
-const STORAGE_USER = "userId";
 const STORAGE_SPOT_NUMBER = "spotNumber";
 const STORAGE_MAP_CENTER_ZOOM = "mapCenterZoom";
 const STORAGE_NEW_SPOT_POS = "newSpotPos";
@@ -73,13 +71,4 @@ function safeSetItem(key, value) {
         }
         throw e;
     }
-}
-
-function clearLocalStorageItems() {
-    localStorage.removeItem(STORAGE_PHOTOS);
-    localStorage.removeItem(STORAGE_RATINGS);
-    localStorage.removeItem(STORAGE_SPOTS);
-    localStorage.removeItem(STORAGE_MAP_CENTER_ZOOM);
-    localStorage.removeItem(STORAGE_SPOT_NUMBER);
-    localStorage.removeItem(STORAGE_IS_NOT_FIRST_START);
 }

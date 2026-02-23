@@ -8,17 +8,27 @@
     box-sizing: border-box;
 }
 
+html {
+    font-size: 16px;
+}
+
+@media (max-width: 480px) {
+    html {
+        font-size: 12px;
+    }
+}
+
 button {
     background-color: #eeeeee;
 }
 
-html { 
-    margin: 0; 
-    height: 100%; 
+html {
+    margin: 0;
+    height: 100%;
 }
 
 body {
-    font-family: sans-serif; 
+    font-family: sans-serif;
     max-width: 800px;
     margin: 0 auto;
 }
@@ -38,12 +48,33 @@ header {
     align-items: center;
 }
 
-.header-full { grid-template-columns: 30px 1fr 70px 40px; }
-.header-type1 { grid-template-columns: 1fr 50px 40px; }
-.header-type2 { grid-template-columns: 30px 1fr 40px; }
-.header-type3 { grid-template-columns: 30px 1fr; }
-.header-type4 { grid-template-columns: 30px 1fr 70px; }
-.header-dialog { grid-template-columns: 30px 1fr 70px; }
+.hidden {
+    display: none;
+}
+
+.header-full {
+    grid-template-columns: 30px 1fr 70px 40px;
+}
+
+.header-type1 {
+    grid-template-columns: 1fr 100px 50px 40px;
+}
+
+.header-type2 {
+    grid-template-columns: 30px 1fr 40px;
+}
+
+.header-type3 {
+    grid-template-columns: 30px 1fr;
+}
+
+.header-type4 {
+    grid-template-columns: 30px 1fr 70px;
+}
+
+.header-dialog {
+    grid-template-columns: 30px 1fr 70px;
+}
 
 /* ヘッダーに記載されるタイトルの文字列 */
 .header-title {
@@ -51,7 +82,11 @@ header {
     font-size: large;
     font-weight: bold;
     white-space: nowrap;
-    overflow:hidden;
+    overflow: hidden;
+}
+
+.user-name {
+    font-size: 0.8rem;
 }
 
 /* 戻るボタン */
@@ -62,14 +97,16 @@ header {
     border: none;
     padding: 0;
 }
-.prev-button .lessthan{
+
+.prev-button .lessthan {
     display: block;
     width: 100%;
     height: 100%;
     position: relative;
     text-decoration: none;
 }
-.prev-button .lessthan::before{
+
+.prev-button .lessthan::before {
     content: "";
     display: block;
     width: 15px;
@@ -94,14 +131,14 @@ header {
     color: white;
     border: 0px solid;
     border-radius: 6px;
-    font-size: large; 
+    font-size: large;
     white-space: nowrap;
 }
 
-.header-button a { 
-    font-size: large; 
-    color: white; 
-    text-decoration: none; 
+.header-button a {
+    font-size: large;
+    color: white;
+    text-decoration: none;
 }
 
 /* 3点リーダ (メニューボタン) */
@@ -125,6 +162,7 @@ header {
     height: 4px;
     background-color: #333;
 }
+
 .three-dot-leader .dot {
     top: 0;
     right: 0;
@@ -133,16 +171,19 @@ header {
     margin: auto;
 }
 
-.three-dot-leader .dot::before, .three-dot-leader .dot::after {
+.three-dot-leader .dot::before,
+.three-dot-leader .dot::after {
     content: '';
 }
 
 .three-dot-leader .dot::before {
-    top: -9px;    /* 上のドットの位置 */
+    top: -9px;
+    /* 上のドットの位置 */
 }
 
 .three-dot-leader .dot::after {
-    top: 9px;     /* 下のドットの位置 */
+    top: 9px;
+    /* 下のドットの位置 */
 }
 
 /* 3点リーダを押した時に表示されるメニューパネル */
@@ -152,7 +193,7 @@ header {
     right: 0;
     background: white;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     display: none;
     z-index: 9999;
     min-width: 160px;
@@ -186,13 +227,13 @@ header {
     color: white;
     border: 0px solid;
     border-radius: 6px;
-    font-size: large; 
+    font-size: large;
     white-space: nowrap;
 }
 
 .primary-button:disabled {
     background: #ddd;
-    color:#f0f0f0;
+    color: #f0f0f0;
 }
 
 /* 基本情報のテキストのデザイン */
@@ -201,6 +242,7 @@ header {
     font-size: small;
     color: #666;
 }
+
 .info-data {
     margin: 0 0 10px 2px;
     width: calc(100% - 5px);
@@ -209,13 +251,16 @@ header {
     background: #F8FCFC;
     white-space: pre-wrap;
 }
+
 .info-data.changed {
     background: #ffe8e8e8;
 }
+
 .info-data-textarea {
     height: 60px;
     resize: vertical;
 }
+
 .info-data-textarea.changed {
     background: #ffe8e8e8;
 }
@@ -227,7 +272,9 @@ header {
     overflow-x: auto;
     margin-bottom: 20px;
 }
+
 #photo-preview-area img {
+    width: 100px;
     flex-shrink: 0;
     margin: 3px;
     object-fit: contain;
@@ -294,7 +341,7 @@ header {
 .modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
 }
 
 .modal-content {
@@ -324,7 +371,8 @@ header {
     align-items: center;
     gap: 10px;
 }
-.modal-button-container button{
+
+.modal-button-container button {
     height: 48px;
     border: none;
     border-radius: 8px;
@@ -334,6 +382,7 @@ header {
 .modal-text {
     padding: 10px;
 }
+
 .modal-text a {
     color: blue;
     text-decoration: underline;
@@ -356,7 +405,9 @@ header {
     cursor: pointer;
     border-radius: 50%;
 }
-.modal-close::before, .modal-close::after {
+
+.modal-close::before,
+.modal-close::after {
     content: "";
     position: absolute;
     top: 50%;
@@ -366,9 +417,11 @@ header {
     background-color: #333;
     transform-origin: center;
 }
+
 .modal-close::before {
     transform: translate(-50%, -50%) rotate(45deg);
 }
+
 .modal-close::after {
     transform: translate(-50%, -50%) rotate(-45deg);
 }

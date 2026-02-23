@@ -1,5 +1,5 @@
 html {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
 header {
@@ -18,29 +18,36 @@ h1 {
     color: #2266cce2;
     font-size: xx-large;
 }
+
 h2 {
     color: #000;
     font-size: x-large;
 }
+
 p {
     color: #333;
 }
 
-table{
+table {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
 }
-table tr:nth-child(odd){
+
+table tr:nth-child(odd) {
     background-color: #eee
 }
-table th,table td{
+
+table th,
+table td {
     padding: 10px 0;
     border: 1px solid gray;
 }
+
 table th {
     text-align: center;
 }
+
 table td {
     text-align: left;
     padding: 2px;

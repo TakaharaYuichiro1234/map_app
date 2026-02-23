@@ -22,7 +22,7 @@ class DetailMapModule {
             className: "user-location"
         }).addTo(this.map);
 
-        this.map.locate({watch:true, setView:false, enableHighAccuracy:true});
+        this.map.locate({ watch: true, setView: false, enableHighAccuracy: true });
         this.map.on("locationfound", e => this.onLocationFound(e));
     }
 
@@ -39,10 +39,10 @@ class DetailMapModule {
         return this.latestCurrentPosition;
     }
 
-    onLocationFound(e) {      
+    onLocationFound(e) {
         const offsetLat = IS_DEBUG ? OFFSET_LAT : 0.0;
         const offsetLng = IS_DEBUG ? OFFSET_LNG : 0.0;
-        
+
         const pos = {
             lat: e.latlng.lat + offsetLat,
             lng: e.latlng.lng + offsetLng

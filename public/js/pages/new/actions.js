@@ -4,7 +4,7 @@ function showPhoto() {
 
     for (const [i, photo] of photoList.entries()) {
         const img = document.createElement("img");
-        img.src = photo;
+        img.src = URL.createObjectURL(photo);
 
         img.addEventListener("click", () => {
             selectedPhotoIndex = i;
@@ -24,19 +24,18 @@ function removePhoto() {
 }
 
 function setMainPhoto() {
-    if ( selectedPhotoIndex >= 1 ) {
+    if (selectedPhotoIndex >= 1) {
         [photoList[0], photoList[selectedPhotoIndex]] = [photoList[selectedPhotoIndex], photoList[0]];
     }
-    
+
     closePhotoModal();
     showPhoto();
 }
 
-function openPhotoModal(src) {
+function openPhotoModal(photo) {
     const modal = document.querySelector(".modal");
     const img = document.getElementById("photo-modal-img");
-
-    img.src = src;
+    img.src = URL.createObjectURL(photo);
     modal.classList.remove("hidden");
 }
 
@@ -46,9 +45,11 @@ function closePhotoModal() {
     selectedPhotoIndex = null;
 }
 
-function registerSpot() {
-    const spotName = document.getElementById("spotName").value;
-    const description = document.getElementById("description").value;
+async function registerSpot() {
+    const form = document.getElementById('store-spot-form');
+    const formData = new FormData(form);
+    const spotName = formData.get('name').trim();
+    const description = formData.get('description').trim();
 
     if (!spotName) {
         alert("スポット名は必須です。");
@@ -60,25 +61,19 @@ function registerSpot() {
         return;
     }
 
-    const newSpotId = saveSpot(
-        spotName, 
-        description, 
-        newSpotPos.lat, 
-        newSpotPos.lng, 
-        address, 
-        getCurrentUser().id
-    );
-    if (!newSpotId) {
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute('content');
+
+    const newSpotId = await saveSpot(csrfToken, spotName, description, newSpotPos.lat, newSpotPos.lng, address);
+    if (newSpotId < 0) {
         alert("スポットの登録に失敗しました。");
         return;
     }
 
-    const photoIds = savePhotos(newSpotId, photoList);
-    if (!photoIds) {
-        alert("写真の登録に失敗しました。");
-    } else {
-        alert("登録しました");
+    const ret = await savePhotos(csrfToken, newSpotId, photoList);
+    if (!ret) {
+        console.error("写真の登録に失敗しました。");
     }
-
-    location.href = `index.html?highlight=${newSpotId}`;
+    location.href = `${BASE_PATH}/spots?highlight=${newSpotId}`;
 }

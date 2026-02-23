@@ -5,43 +5,42 @@
 // -----------------------------
 // 初期設定
 // -----------------------------
-const mCurrentPositionStatus = {position: null, lastUpdate:null};
+const mCurrentPositionStatus = { position: null, lastUpdate: null };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await init();    
+    await init();
 });
 
 // -----------------------------
 // 初期設定用の関数
 // -----------------------------
 async function init() {
-    const params = new URLSearchParams(location.search);
-    const id = params.get("id");
-
-    // このスポットが自分の作成したスポットかどうかをチェック
-    const isOwner = (getSpotById(id).ownerId === getCurrentUser().id);
+    // const match = window.location.pathname.match(/\/spots\/(\d+)/);
+    // const id = match ? match[1] : null;
+    const spot = await getSpotById(id);
+    const isOwner = user ? (spot.ownerUuid === user['uuid']) : false;
 
     // カメラ・写真関連の処理の初期化
-    await initPhotoProcess(id, isOwner);
+    await initPhotoProcess(isOwner);
 
     // ページのトップに戻るボタン
     initToPageTop('to-page-top');
 
     // セクションごとにデータを表示
-    initViewMain(id, isOwner);
-    showPhoto(id);
-    initViewHistory(id);
+    initViewMain(isOwner, spot);
+    showPhoto();
+    initViewHistory();
 
     // イベントリスナーを設定
-    setButtonListener(id);
-    setPhotoButtonListener(id, isOwner);
-    setInputElementListener(id);
+    setButtonListener();
+    setPhotoButtonListener(isOwner);
+    setInputElementListener();
 
     // 位置情報取得可否のモニタリングの初期化
     initMonitoringCurrentPosition()
 }
 
-async function initPhotoProcess(id, isOwner) {
+async function initPhotoProcess(isOwner) {
     const photoSelectBtnElementId = "photo-select-btn";
     const photoInputElementId = "photo-input";
     const fileSelectBtnElementId = "file-select-btn";
@@ -49,38 +48,42 @@ async function initPhotoProcess(id, isOwner) {
 
     // カメラ設定 : utils/photo/camera-using.js
     if (isOwner) await cameraUsing(photoSelectBtnElementId);
-    
+
     // 写真撮影/ファイル選択した後のコールバック : utils/photo/photo-selector.js
     initPhotoSelector(
-        photoSelectBtnElementId, 
-        photoInputElementId, 
-        fileSelectBtnElementId, 
+        photoSelectBtnElementId,
+        photoInputElementId,
+        fileSelectBtnElementId,
         fileInputElementId,
         (e) => handlePhotoSelect(e, {
-            onEach: (img) => {
-                if (!savePhotos(id, [img]))  return false;
+            onEach: async (img) => {
+                const csrfToken = document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute('content');
+                const ret = await savePhotos(csrfToken, id, [img]);
+                if (!ret) return false;
                 return true;
             },
-            onComplete: () => showPhoto(id)
+            onComplete: async () => await showPhoto(id)
         })
     );
 }
 
-function setPhotoButtonListener(id, isOwner) {
-    document.querySelector(".modal-button-container").style.display = isOwner? "flex": "none";
+function setPhotoButtonListener(isOwner) {
+    document.querySelector(".modal-button-container").style.display = isOwner ? "flex" : "none";
     document.querySelector(".modal-backdrop").addEventListener("click", closePhotoModal);
     document.querySelector(".modal-close").addEventListener("click", closePhotoModal);
-    document.getElementById("photo-modal-remove").addEventListener("click", () => removePhoto(id));
-    document.getElementById("photo-modal-set-main").addEventListener("click", () => setMainPhoto(id));
+    document.getElementById("photo-modal-remove").addEventListener("click", () => removePhoto());
+    document.getElementById("photo-modal-set-main").addEventListener("click", () => setMainPhoto());
 }
 
-function setButtonListener(id) {
-    document.getElementById("back").addEventListener("click", () => back(id));
-    document.getElementById("submit-rating").addEventListener("click", () => submitRating(id));
-    document.getElementById("remove").addEventListener("click", () => remove(id));
+function setButtonListener() {
+    document.getElementById("back").addEventListener("click", () => back());
+    document.getElementById("submit-rating").addEventListener("click", () => submitRating());
+    document.getElementById("remove").addEventListener("click", () => remove());
 }
 
-function setInputElementListener(id) {
+function setInputElementListener() {
     setupEditableField({
         inputEl: document.getElementById("title-input"),
         buttonEl: document.getElementById("update-name"),
@@ -144,7 +147,10 @@ function updateSpotField({
         return false;
     }
 
-    const resp = updateSpot(spotId, { [fieldName]: value });
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute('content');
+    const resp = updateSpot(csrfToken, spotId, { [fieldName]: value });
     if (!resp) {
         alert("データの更新に失敗しました");
         return false;
@@ -163,7 +169,7 @@ function initMonitoringCurrentPosition() {
     }, 5000);
 }
 
-function showDistanceComment(spotPosition=null) {
+function showDistanceComment(spotPosition = null) {
     let distance = null;
     if (mCurrentPositionStatus.position && spotPosition) {
         distance = MathModule.distance(
@@ -172,10 +178,10 @@ function showDistanceComment(spotPosition=null) {
             spotPosition.lat,
             spotPosition.lng
         );
-    } 
+    }
 
     const dom = document.getElementById("distance-comment");
-    dom.innerHTML = distance ? `スポットとの距離：約${Math.round(distance*10)/10}km` : "現在地を取得できません。";
+    dom.innerHTML = distance ? `スポットとの距離：約${Math.round(distance * 10) / 10}km` : "現在地を取得できません。";
     dom.style.display = "block";
 
     setRatingInputsViewing(distance);

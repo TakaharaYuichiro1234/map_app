@@ -1,42 +1,61 @@
 let mSelectedPhotoId = null;
 
-function showPhoto(id) {
+async function showPhoto() {
     const domPhotoPreviewArea = document.getElementById("photo-preview-area");
     domPhotoPreviewArea.innerHTML = "";
 
-    const photos = getPhotosBySpotId(id);
+    const photos = await getPhotosBySpotId(id);
     photos.forEach(photo => {
         const img = document.createElement("img");
-        img.src = photo.photoData;
+        const path = `${BASE_PATH}/uploads/${photo.spotId}/${photo.filename}`;
+        img.src = path;
+        img.onerror = function () {
+            this.onerror = null; // 無限ループ防止
+            this.src = `${BASE_PATH}/resources/img/noimage.png`;
+        };
 
         img.addEventListener("click", () => {
             mSelectedPhotoId = photo.id;
-            openPhotoModal(photo.photoData);
+            openPhotoModal(photo);
         });
 
         domPhotoPreviewArea.appendChild(img);
     });
 }
 
-function removePhoto(spotId) {
+async function removePhoto() {
     if (!confirm("この写真を削除しますか？")) return;
 
-    removePhotoById(mSelectedPhotoId); 
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute('content');
+
+    await removePhotoById(csrfToken, mSelectedPhotoId);
     closePhotoModal();
-    showPhoto(spotId);
+    await showPhoto();
 }
 
-function setMainPhoto(spotId) {
-    swapMainPhoto(spotId, mSelectedPhotoId);
+async function setMainPhoto() {
+    const csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute('content');
+
+    await swapMainPhoto(csrfToken, id, mSelectedPhotoId);
     closePhotoModal();
-    showPhoto(spotId);
+    await showPhoto();
 }
 
-function openPhotoModal(src) {
+function openPhotoModal(photo) {
     const modal = document.querySelector(".modal");
     const img = document.getElementById("photo-modal-img");
 
-    img.src = src;
+    const path = `${BASE_PATH}/uploads/${photo.spotId}/${photo.filename}`;
+    img.src = path;
+    img.onerror = function () {
+        this.onerror = null; // 無限ループ防止
+        this.src = `${BASE_PATH}/resources/img/noimage.png`;
+    };
+
     modal.classList.remove("hidden");
 }
 

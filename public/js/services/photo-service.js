@@ -1,52 +1,157 @@
 // *****************************
 // 写真(photos)データ管理
 // *****************************
-function loadPhotos() {
-    return JSON.parse(localStorage.getItem(STORAGE_PHOTOS) || "[]");
-}
-
-function savePhotos(spotId, base64imgs) {
-    const photos = loadPhotos();
+async function savePhotos(csrfToken, spotId, files) {
     const ids = [];
-    for(const img of base64imgs) {
-        const id = generateUUID();
-        // const id = crypto.randomUUID();
-        const photo = {
-            id: id,
-            spotId: spotId,
-            photoData: img
-        };
-        photos.push(photo);
-        ids.push(id);
+
+    for (const file of files) {
+        const formData = new FormData();
+        formData.append('csrf_token', csrfToken);
+        formData.append('photo', file);
+        formData.append('spot_id', spotId);
+
+        const res = await fetch(`${BASE_PATH}/api/photos/store`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+        if (!data.success) return null;
     }
 
-    if (!safeSetItem(STORAGE_PHOTOS, JSON.stringify(photos))) return null;
-    return ids;
-}
-
-function getPhotosBySpotId(spotId) {
-    const photos = loadPhotos();
-    return photos.filter(s => s.spotId == spotId);
-}
-
-function removePhotoById(targetPhotoId) {
-    const photos = loadPhotos();
-    const filtered = photos.filter(p => p.id !== targetPhotoId);
-    if (!safeSetItem(STORAGE_PHOTOS, JSON.stringify(filtered))) return false;
     return true;
+}
+
+async function getPhotosBySpotId(spotId) {
+    try {
+        const url = `${BASE_PATH}/api/photos/get_by_spot_id/${spotId}`
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error('通信エラー');
+        }
+
+        const result = await res.json();
+
+        if (!result.success) throw new Error('エラー');
+
+        const photos = result.photos.map(photo => {
+            return {
+                id: photo.id,
+                spotId: photo.spot_id,
+                uuid: photo.uuid,
+                filename: photo.filename,
+                sort_order: photo.sort_order,
+                createdAt: photo.created_at,
+            }
+        })
+
+        return photos;
+
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
+}
+
+
+async function getMainPhoto(spotId) {
+    try {
+        const url = `${BASE_PATH}/api/photos/get_main/${spotId}`
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error('通信エラー');
+        }
+
+        const result = await res.json();
+
+        if (!result.success) throw new Error('エラー');
+        if (!result.photo) return null;
+
+        return {
+            id: result.photo.id,
+            spotId: result.photo.spot_id,
+            uuid: result.photo.uuid,
+            filename: result.photo.filename,
+            sort_order: result.photo.sort_order,
+            createdAt: result.photo.created_at,
+        };
+
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+async function removePhotoById(csrfToken, targetPhotoId) {
+    const formData = new FormData();
+    formData.append('csrf_token', csrfToken);
+    formData.append('id', targetPhotoId);
+
+    try {
+        const url = `${BASE_PATH}/api/photos/delete`
+        const res = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin', // セッション / CSRF用
+        });
+
+
+        if (!res.ok) {
+            throw new Error('通信エラー');
+        }
+
+        const result = await res.json();
+
+
+        if (!result.success) throw new Error('データベースエラー');
+        return true;
+
+    } catch (err) {
+        console.error(err);
+        return false;
+    }
+
 }
 
 // このspotIdに登録されている複数の写真の先頭に、targetPhotoIdの写真を移動する
-function swapMainPhoto(spotId, targetPhotoId) {
-    const photos = loadPhotos();
-    const filtered = photos.filter(s => s.spotId == spotId);
-    const index = filtered.findIndex(photo => photo.id === targetPhotoId);
-    if ( index <= 0 ) return true;   // filteredのなかで、すでに先頭にあるので終了
+async function swapMainPhoto(csrfToken, spotId, targetPhotoId) {
+    const formData = new FormData();
+    formData.append('csrf_token', csrfToken);
+    formData.append('id', targetPhotoId);
+    formData.append('spot_id', spotId);
 
-    const dstPhotoIdInFiltered = filtered[0].id; // filteredのなかで先頭の写真のID
-    const dstPhotoIndex = photos.findIndex(photo => photo.id === dstPhotoIdInFiltered);
-    const targetPhotoIndex = photos.findIndex(photo => photo.id === targetPhotoId);
-    [photos[dstPhotoIndex], photos[targetPhotoIndex]] = [photos[targetPhotoIndex], photos[dstPhotoIndex]];
-    if (!safeSetItem(STORAGE_PHOTOS, JSON.stringify(photos))) return false;
-    return true;
+    try {
+        const url = `${BASE_PATH}/api/photos/reorder`
+        const res = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin', // セッション / CSRF用
+        });
+
+
+        if (!res.ok) {
+            throw new Error('通信エラー');
+        }
+
+        const result = await res.json();
+
+        if (!result.success) throw new Error('データベースエラー');
+        return true;
+
+    } catch (err) {
+        console.error(err);
+        return false;
+    }
 }

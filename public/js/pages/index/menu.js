@@ -16,10 +16,10 @@ function menuButtonListener() {
     document.querySelectorAll(".menu-item").forEach(item => {
         item.addEventListener("click", (e) => {
             const action = e.target.dataset.action;
-            if (action === 'clear') {
-                dataClear();
-            } else if (action === 'user') {
-                toUserPage();
+            if (action === 'login') {
+                window.location.href = `${BASE_PATH}/show_login`;
+            } else if (action === 'logout') {
+                document.getElementById('logout').submit();
             } else if (action === 'dummy') {
                 createDummySpots();
             } else if (action === 'manual') {
@@ -35,20 +35,6 @@ function menuButtonListener() {
     });
 }
 
-function dataClear() {
-    const size = getLocalStorageSizeKB();
-    const msg = `保存されているデータを全て削除してよろしいですか？\n現在使用中のローカルストレージ容量：${Math.round(size)} KB`;
-    if (confirm(msg)) {
-        clearLocalStorageItems();
-        alert("データを削除しました");
-        mapInstance.refreshMap();
-        listInstance.init();
-    }
-}
-
 function toManualPage() {
-    window.location.href = "manual.html";
-}
-function toUserPage() {
-    window.location.href = "user.html";
+    location.href = `${BASE_PATH}/manuals`;
 }

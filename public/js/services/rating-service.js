@@ -1,77 +1,162 @@
 // *****************************
 // 評価(rating)データ管理
 // *****************************
-function loadRatings() {
-    return JSON.parse(localStorage.getItem(STORAGE_RATINGS) || "[]");
+async function loadRatings() {
+    try {
+        const url = `${BASE_PATH}/api/ratings`
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        if (!res.ok) throw new Error('通信エラー');
+
+        const result = await res.json();
+        if (!result.success) throw new Error('データベースエラー');
+
+        const ratings = result.ratings.map(rating => {
+            return {
+                id: rating.id,
+                spotId: rating.spot_id,
+                date: rating.date,
+                rating: rating.rating,
+                comment: rating.comment,
+                createdAt: rating.created_at,
+                updatedAt: rating.updated_at,
+            }
+        })
+        return ratings;
+
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
 }
 
-function getRating(spotId, userId, rating, comment, createdAt) {
-    const id = generateUUID();
-    // const id = crypto.randomUUID();
-    return {id, spotId, userId, rating, comment, createdAt};
+async function saveRating(csrfToken, spotId, date, rating, comment, uuid = "") {    // uuid=""のときはDB側でSESSIONのuserを取得
+    const formData = new FormData();
+    formData.append('csrf_token', csrfToken);
+    formData.append('spot_id', spotId);
+    formData.append('date', date);
+    formData.append('rating', rating);
+    formData.append('comment', comment);
+    formData.append('uuid', uuid);
+
+    try {
+        const url = `${BASE_PATH}/api/ratings/store`;
+        const res = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin', // セッション / CSRF用
+        });
+        if (!res.ok) throw new Error('通信エラー');
+        
+        const result = await res.json();
+        if (!result.success) throw new Error('書き込みエラー');
+        return true;
+
+    } catch (err) {
+        console.error(err);
+        return false;
+    }
 }
 
-function saveRating(spotId, userId, rating, comment, createdAt) {
-    const data = getRating(spotId, userId, rating, comment, createdAt.toISOString());
-    const list = loadRatings();
-    list.push(data);
-    if (!safeSetItem(STORAGE_RATINGS, JSON.stringify(list))) return false;
-
-    return true;
-}
-
-// ダミーデータ作成用に、localStorageに一括でratingを保存する
-function saveRatings(spotId, ratingData) {
-    const list = loadRatings();
-
+async function saveDummyRatings(csrfToken, spotId, ratingData) {
     for (const ratingDatum of ratingData) {
-        if (!isRated(spotId, ratingDatum.userId, ratingDatum.createdAt)) {  
-            const data = getRating(
-                spotId,
-                ratingDatum.userId,
-                ratingDatum.rating,
-                ratingDatum.comment,
-                ratingDatum.createdAt.toISOString()
-            );
-            list.push(data);            
+        const ret = await saveRating(csrfToken, spotId, ratingDatum.date, ratingDatum.rating, ratingDatum.comment, ratingDatum.userUuid);
+        if (!ret) {
+            console.error('ダミーの評価データ作成失敗');
         }
     }
-
-    if (!safeSetItem(STORAGE_RATINGS, JSON.stringify(list))) return false;
     return true;
 }
 
-function removeRating(id) {
-    const ratings = loadRatings();
-    const filtered = ratings.filter(r => r.id !== id);
-    if (!safeSetItem(STORAGE_RATINGS, JSON.stringify(filtered))) return false;
-    return true;
+async function removeRating(csrfToken, targetId) {
+    const formData = new FormData();
+    formData.append('csrf_token', csrfToken);
+    formData.append('id', targetId);
+
+    try {
+        const url = `${BASE_PATH}/api/ratings/delete`
+        const res = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin', // セッション / CSRF用
+        });
+        if (!res.ok) throw new Error('通信エラー');
+
+        const result = await res.json();
+        if (!result.success) throw new Error('データベースエラー');
+        return true;
+
+    } catch (err) {
+        console.error(err);
+        return false;
+    }
 }
 
-function isRated(spotId, userId, createdAt){
-    const list = loadRatings();
+async function isRated(spotId, uuid, date) {
+    try {
+        const url = `${BASE_PATH}/api/ratings/is_rated/${spotId}/${uuid}/${date}`;
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        if (!res.ok) throw new Error('通信エラー');
 
-    // 一人のuserは、一つのスポットに対して、1日1回だけ評価を登録できる
-    const ratingIndex = list.findIndex(r =>
-        r.spotId === spotId &&
-        r.userId === userId &&
-        isSameDay(new Date(r.createdAt), createdAt)
-    );
+        const result = await res.json();
+        if (!result.success) throw new Error('書き込みエラー');
+        return result.is_rated;
 
-    return ratingIndex !== -1;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
 }
 
-function getRatingsBySpotId(spotId) {
-    const ratings = loadRatings();
-    return ratings.filter(s => s.spotId == spotId);
+async function getRatingsBySpotId(spotId) {
+    try {
+        const url = `${BASE_PATH}/api/ratings/get_by_spot_id/${spotId}`
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        if (!res.ok) throw new Error('通信エラー');
+
+        const result = await res.json();
+        if (!result.success) throw new Error('エラー');
+        
+        const ratings = result.ratings.map(rating => {
+            return {
+                id: rating.id,
+                spotId: rating.spot_id,
+                uuid: rating.uuid,
+                date: rating.date,
+                rating: rating.rating,
+                comment: rating.comment,
+                createdAt: rating.created_at,
+                updatedAt: rating.updated_at,
+            }
+        })
+        return ratings;
+
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
 }
 
-function getSpotRatingStats(spotId) {
-    const dailyRating = getDailyRating(spotId);
+async function getSpotRatingStats(spotId) {
+    const dailyRating = await getDailyRating(spotId);
     const totalUsers = dailyRating.userCount;
-    const {recentRating, pastRating} = calRatingTrend(dailyRating.ratings);
+    const { recentRating, pastRating } = calRatingTrend(dailyRating.ratings);
 
-    return {"recentRating":Math.round(recentRating), "pastRating":Math.round(pastRating), "totalUsers": totalUsers};
+    return { "recentRating": Math.round(recentRating), "pastRating": Math.round(pastRating), "totalUsers": totalUsers };
 }
 
 function calRatingTrend(ratings) {
@@ -81,7 +166,7 @@ function calRatingTrend(ratings) {
     // 直近3日の評価値
     const ratingsInRecentDays = ratings.slice(-RECENT_DAYS).filter(r => r !== null);
     if (ratingsInRecentDays.length === 0) {
-        return {"recentRating":recentRating, "pastRating":pastRating};
+        return { "recentRating": recentRating, "pastRating": pastRating };
     }
 
     // 直近3日の評価値の平均をrecentRatingとする
@@ -89,30 +174,30 @@ function calRatingTrend(ratings) {
     pastRating = recentRating;
 
     // 4日前より前のデータがなければpastRating=recentRating
-    const ratingsBeforeRecentDays = ratings.slice(0, -(RECENT_DAYS+1)).filter(r => r !== null);
+    const ratingsBeforeRecentDays = ratings.slice(0, -(RECENT_DAYS + 1)).filter(r => r !== null);
     if (ratingsBeforeRecentDays.length === 0) {
-        return { "recentRating":recentRating, "pastRating": pastRating };
+        return { "recentRating": recentRating, "pastRating": pastRating };
     }
-    
+
     // 1次近似で31日前の評価値を算出する
     // 31日前をx=0としてy=ax+bにフィッティングすることで、y切片が31日前の評価値となる
     const n = ratings.length;
-    const x = Array.from({ length: n}, (_, i) => i);
-    const {_, intercept} = leastSquares(x, ratings);
+    const x = Array.from({ length: n }, (_, i) => i);
+    const { _, intercept } = leastSquares(x, ratings);
     if (intercept !== null) {
         pastRating = Math.min(MAX_RATING, Math.max(MIN_RATING, intercept));
     }
 
     // recentRatingとpastRatingの差が±1以内なら変化なしとみなす
-    if (Math.abs(recentRating-pastRating) <= 1) pastRating = recentRating;
-    
-    return { "recentRating":recentRating, "pastRating": pastRating };
+    if (Math.abs(recentRating - pastRating) <= 1) pastRating = recentRating;
+
+    return { "recentRating": recentRating, "pastRating": pastRating };
 }
 
 function leastSquares(x, y) {
     if (x.length !== y.length) {
         console.error("x と y の要素数が一致していません");
-        return {slope:null, intercept:null}
+        return { slope: null, intercept: null }
     }
 
     // yがnullでないデータのみ抽出
@@ -126,7 +211,7 @@ function leastSquares(x, y) {
     const n = points.length;
     if (n < 2) {
         console.error("有効なデータ点が不足しています");
-        return {slope:null, intercept:null}
+        return { slope: null, intercept: null }
     }
 
     let sumX = 0;
@@ -144,7 +229,7 @@ function leastSquares(x, y) {
     const a = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
     const b = (sumY - a * sumX) / n;
 
-    return { slope:a, intercept:b };
+    return { slope: a, intercept: b };
 }
 
 function countUniqueUserIds(data) {
@@ -158,8 +243,8 @@ function countUniqueUserIds(data) {
     return userIdSet.size;
 }
 
-function getDailyRating(spotId) {
-    const list = loadRatings().filter(r => r.spotId === spotId);
+async function getDailyRating(spotId) {
+    const list = await getRatingsBySpotId(spotId);
     const uniqueUserIds = getUniqueUserIds(list);
     const userCount = uniqueUserIds.size;
 
@@ -168,54 +253,54 @@ function getDailyRating(spotId) {
 
     // days(31日前から今日までの日付の配列)に対応する評価値の配列を、ユーザー毎に作成
     const ratingsEachUsers = {};
-    for (let userId of uniqueUserIds) {
-        const listEachUser = list.filter(r => r.userId === userId);
-        ratingsEachUsers[userId] = createRatingArrayInTerm(listEachUser, days);
+    for (let uuid of uniqueUserIds) {
+        const listEachUser = list.filter(r => r.uuid === uuid);
+        ratingsEachUsers[uuid] = createRatingArrayInTerm(listEachUser, days);
     }
 
     // ユーザー毎のratings配列のi番目の要素を平均する(nullの場合を考慮)
     const avgRatings = new Array(days.length).fill(null);
     for (let i = 0; i < avgRatings.length; i++) {
         let sum = 0;
-        let counts = 0;     
+        let counts = 0;
         for (let key in ratingsEachUsers) {
             const rating = ratingsEachUsers[key][i];
             if (rating !== null) {
                 sum += rating;
-                counts ++;
-            } 
+                counts++;
+            }
         }
-        if (counts> 0) {
-            avgRatings[i] = sum/counts;
+        if (counts > 0) {
+            avgRatings[i] = sum / counts;
         }
     }
 
-    return {"days":days, "ratings":avgRatings, "userCount": userCount};
+    return { "days": days, "ratings": avgRatings, "userCount": userCount };
 }
 
-function getDailyRatingEachUser(spotId, userId) {
-    const list = loadRatings().filter(r => r.spotId === spotId);
+async function getDailyRatingEachUser(spotId, uuid) {
+    const list = await getRatingsBySpotId(spotId);
 
     // 31日前(=TERM+1日)から今日までの日付データの配列daysを作成
     const days = createDayArrayInTerm();
 
     // days(31日前から今日までの日付の配列)に対応する評価値の配列を、ユーザー毎に作成
-    const listEachUser = list.filter(r => r.userId === userId);
+    const listEachUser = list.filter(r => r.uuid === uuid);
     ratings = createRatingArrayInTerm(listEachUser, days);
 
-    return {"days":days, "ratings":ratings};
+    return { "days": days, "ratings": ratings };
 }
 
 function createDayArrayInTerm() {
     const today = new Date();
 
     const iniDay = new Date(today);
-    iniDay.setDate(today.getDate() - (TERM+1));
-    const days = [iniDay];  // 配列の先頭は31日前の日付
+    iniDay.setDate(today.getDate() - (TERM + 1));
+    const days = [formatDate(iniDay)];  // 配列の先頭は31日前の日付
     for (let i = 0; i <= TERM; i++) {
         const d = new Date(today);
         d.setDate(today.getDate() - (TERM - i));
-        days.push(d);   // 30日前から今日までの日付を配列に追加
+        days.push(formatDate(d));   // 30日前から今日までの日付を配列に追加
     }
 
     return days;
@@ -226,18 +311,17 @@ function createRatingArrayInTerm(listEachUser, days) {
     // まずは、日付をキー、評価値をバリューとするオブジェクトに再編
     const dailyRatingAll = {};
     for (let datum of listEachUser) {
-        const d = formatDateKey(new Date(datum.createdAt));
+        const d = datum.date;
         if (!(d in dailyRatingAll)) {
             dailyRatingAll[d] = datum.rating;
-        } 
+        }
     }
 
     // 配列の最初の値(31日前に相当)は、期間の前で、かつ、最新の日付の評価値を入れる
     let latestRatingBeforeTerm = null;
     const borderDate = days[0]; // 31日前(=30日前の1日前)の日付
     let maxDateBeforeTerm = null;
-    for (let key of Object.keys(dailyRatingAll)) {
-        const keyDate = new Date(key);
+    for (let keyDate of Object.keys(dailyRatingAll)) {
         if (keyDate <= borderDate) {
             if (keyDate >= maxDateBeforeTerm) {
                 latestRatingBeforeTerm = dailyRatingAll[key];
@@ -245,17 +329,17 @@ function createRatingArrayInTerm(listEachUser, days) {
             }
         }
     }
-    
+
     // 30日前から今日までの評価値の配列。
     // 欠損値は直前の評価値で埋める。ただし、今日の評価値が欠損の場合はnullのままにしておく
     const ratings = [latestRatingBeforeTerm];
     for (let i = 1; i < days.length; i++) {
-        const fd = formatDateKey(days[i]);
+        const fd = days[i];
         if (fd in dailyRatingAll) {
             ratings.push(dailyRatingAll[fd]);
         } else {
             if (i < days.length - 1) {
-                ratings.push(ratings[i-1]);
+                ratings.push(ratings[i - 1]);
             } else {
                 ratings.push(null);
             }
@@ -268,8 +352,8 @@ function getUniqueUserIds(data) {
     const userIdSet = new Set();
 
     data.forEach(datum => {
-        if (datum.userId != null) {
-            userIdSet.add(datum.userId);
+        if (datum.uuid != null) {
+            userIdSet.add(datum.uuid);
         }
     });
     return userIdSet;

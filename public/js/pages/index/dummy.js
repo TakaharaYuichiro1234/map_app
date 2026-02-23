@@ -3,7 +3,7 @@
 // *****************************
 
 async function createDummySpots() {
-    const TOTAL_DUMMIES = 5;
+    const TOTAL_DUMMIES = 1;
 
     const center = mapInstance.getMapCenter();
     centerLat = center.lat;
@@ -13,61 +13,54 @@ async function createDummySpots() {
 
     const bounds = mapInstance.getMapBounds();
     const rangeLat = bounds.getNorthEast().lat - bounds.getSouthWest().lat;
-    const rangeLng = bounds.getNorthEast().lng - bounds.getSouthWest().lng; 
+    const rangeLng = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    const currentUserUuid = user['uuid'];
+    const allUsers = await getUsers();
+    const userUuidAll = allUsers.map(u => u.uuid);
 
-    const today = new Date();
-    const currentUserId = getCurrentUser().id;
-
-    for(let i=0; i<TOTAL_DUMMIES; i++) {
+    for (let i = 0; i < TOTAL_DUMMIES; i++) {
         const name = `ダミースポット#${getSpotNumber()}`;
         const description = "";
         const lat = (Math.random() - 0.5) * rangeLat + centerLat;
         const lng = (Math.random() - 0.5) * rangeLng + centerLng;
         const addData = await MuniModule.reverseGeocode(lat, lng);
-        const address = addData? addData.pref + addData.city + addData.region: "住所が取得できませんでした";
-        
-        const spotId = saveSpot(name, description, lat, lng, address, currentUserId);
+        const address = addData ? addData.pref + addData.city + addData.region : "住所が取得できませんでした";
+
+        const spotId = await saveSpot(csrfToken, name, description, lat, lng, address);
         if (!spotId) return;
 
-        const totalUsers = Math.floor(Math.random() * 6);   // 0人から5人
-        const userIdsAll = ["1","2","3","4","5"];
-        const userIds = userIdsAll.filter(id => id!==currentUserId); // 現在のユーザーは除外
-        while (userIds.length > totalUsers) {
-            const index = Math.floor(Math.random() * userIds.length);
-            userIds.splice( index, 1 ); // userIdをどれか一つ減らす
+        const totalUsers = Math.floor(Math.random() * 3);   // 0人から5人
+        const userUuids = userUuidAll.filter(id => id !== currentUserUuid); // 現在のユーザーは除外
+        while (userUuids.length > totalUsers) {
+            const index = Math.floor(Math.random() * userUuids.length);
+            userUuids.splice(index, 1); // userIdをどれか一つ減らす
         }
 
         const ratingData = [];
-        for (let userId of userIds) {
-            const ratings = dummyRatings(TERM+2, "random"); // random, increase, decrease, fixed
+        for (let userUuid of userUuids) {
+            const ratings = dummyRatings(TERM + 2, "random"); // random, increase, decrease, fixed
 
             for (const [j, rating] of ratings.entries()) {
-                const d = new Date(today);
+                const d = new Date();
                 d.setDate(d.getDate() - j);
 
                 if (rating !== null) {
                     ratingData.push({
-                        userId,
-                        createdAt: d,
+                        userUuid,
+                        date: formatDate(d),
                         rating,
                         comment: ''
                     });
                 }
             }
         }
-        if (!saveRatings(spotId, ratingData)) return;
 
-        const stats = getSpotRatingStats(spotId);
-        const updatingSpotData = {
-            totalUsers: stats.totalUsers,
-            recentRating: stats.recentRating,
-            pastRating: stats.pastRating
-        }
-        updateSpot(spotId, updatingSpotData);
+        const ret = await saveDummyRatings(csrfToken, spotId, ratingData);
+        if (!ret) return;
     }
 
-    mapInstance.refreshMap();
-    listInstance.init();    
+    location.href = `${BASE_PATH}`;
 }
 
 function dummyRatings(total, type = "random") {
@@ -91,9 +84,9 @@ function dummyRatings(total, type = "random") {
 
 function dummyRatingsRandom(total) {
     let ratings = [];
-    for (let i=0; i<total; i++) {
+    for (let i = 0; i < total; i++) {
         // MAXとMINの範囲外のときはnull (あえて欠損値を作っている)
-        r = Math.floor(Math.random() * MAX_RATING*4) + 1; 
+        r = Math.floor(Math.random() * MAX_RATING * 4) + 1;
         if (r <= MAX_RATING && r >= MIN_RATING) {
             ratings.push(r);
         } else {
@@ -105,8 +98,8 @@ function dummyRatingsRandom(total) {
 
 function dummyRatingsIncrease(total) {
     let ratings = [];
-    for (let i=0; i<total; i++) {
-        r = Math.max(MIN_RATING, Math.floor(MAX_RATING * ( 1- (i/total))+1));
+    for (let i = 0; i < total; i++) {
+        r = Math.max(MIN_RATING, Math.floor(MAX_RATING * (1 - (i / total)) + 1));
         ratings.push(r);
     }
     return ratings;
@@ -114,21 +107,21 @@ function dummyRatingsIncrease(total) {
 
 function dummyRatingsDecrease(total) {
     let ratings = [];
-    for (let i=0; i<total; i++) {
-        r = Math.max(MIN_RATING, Math.floor(i/total * MAX_RATING) + 1); 
+    for (let i = 0; i < total; i++) {
+        r = Math.max(MIN_RATING, Math.floor(i / total * MAX_RATING) + 1);
         ratings.push(r);
     }
     return ratings;
 }
 
-function dummyRatingsFixed(){
+function dummyRatingsFixed() {
     let ratings = [
-        3,3,3.3,3.3,3.2,2,
-        3,2.5,2.5,2.8,3,3,
-        4,4,3.3,3.3,3.3,3.3,
-        4,4.2,4.2,4,5,5,
-        4.5,4.5,4,4,5,5,
-        5,5,5
+        3, 3, 3.3, 3.3, 3.2, 2,
+        3, 2.5, 2.5, 2.8, 3, 3,
+        4, 4, 3.3, 3.3, 3.3, 3.3,
+        4, 4.2, 4.2, 4, 5, 5,
+        4.5, 4.5, 4, 4, 5, 5,
+        5, 5, 5
     ];
 
     return ratings;

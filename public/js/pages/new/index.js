@@ -21,12 +21,12 @@ async function initPhotoProcess() {
 
     // カメラ設定 : utils/photo/camera-using.js
     await cameraUsing(photoSelectBtnElementId);
-    
+
     // 写真撮影/ファイル選択した後のコールバック : utils/photo/photo-selector.js
     initPhotoSelector(
-        photoSelectBtnElementId, 
-        photoInputElementId, 
-        fileSelectBtnElementId, 
+        photoSelectBtnElementId,
+        photoInputElementId,
+        fileSelectBtnElementId,
         fileInputElementId,
         (e) => handlePhotoSelect(e, {
             onEach: (img) => photoList.push(img),

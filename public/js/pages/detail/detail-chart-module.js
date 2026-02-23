@@ -3,16 +3,15 @@ class DetailChartModule {
         this.chartDomId = chartDomId;
         this.spotId = spotId;
         this.userId = userId;
-
         this._ratings = [];
     }
 
-    init() {
+    async init() {
         const dailyRating = this.userId
-            ? getDailyRatingEachUser(this.spotId, this.userId)
-            : getDailyRating(this.spotId);
+            ? await getDailyRatingEachUser(this.spotId, this.userId)
+            : await getDailyRating(this.spotId);
 
-        const days = dailyRating.days.map(day => formatDateLabel(day));
+        const days = dailyRating.days.map(day => day.substr(5));
         this._ratings = dailyRating.ratings.map(this.formatRating);
         this.drawChart(days, this._ratings);
     }

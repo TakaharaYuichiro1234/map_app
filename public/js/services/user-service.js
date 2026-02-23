@@ -1,50 +1,62 @@
 // *****************************
 // ユーザーデータ管理
 // *****************************
-function getUserId() {
-    let uid = localStorage.getItem(STORAGE_USER);
-    if (!uid) {
-        users = getUsers();
-        uid = users[0].id;
-        if (!safeSetItem(STORAGE_USER, uid)) return null;
+async function getUserByUuid(uuid) {
+    try {
+        const url = `${BASE_PATH}/api/users/${uuid}`
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error('通信エラー');
+        }
+        const result = await res.json();
+        if (!result.success) throw new Error('データベースエラー');
+
+        const user = {
+            uuid: result.user.uuid,
+            name: result.user.name,
+            role: result.user.role
+        };
+        return user;
+
+    } catch (err) {
+        console.error(err);
+        return null;
     }
-    return uid;
 }
 
-function setUserId(id) {
-    if (!safeSetItem(STORAGE_USER, id)) return false;
-    return true;
-}
+async function getUsers() {
+    try {
+        const url = `${BASE_PATH}/api/users`
+        const res = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
 
-function getCurrentUser() {
-    const id = localStorage.getItem(STORAGE_USER);
-    const users = getUsers();
-    const found = users.filter(user => user.id === id);
-    let currentUser;
-    if (found.length > 0) {
-        currentUser = found[0];
-    } else {
-        currentUser = users[0];
-        setUserId(currentUser.id);
-    }
-    return currentUser;
-}
+        if (!res.ok) {
+            throw new Error('通信エラー');
+        }
+        const result = await res.json();
+        if (!result.success) throw new Error('データベースエラー');
 
-function getUserById(id) {
-    const users = getUsers();
-    const found = users.filter(user => user.id === id);
-    let user = null;
-    if (found.length > 0) {
-        user = found[0];
-    }
-    return user;
-}
+        const users = result.users.map(u => {
+            return {
+                uuid: u.uuid,
+                name: u.name,
+                role: u.role
+            }
+        })
+        return users;
 
-function getUsers() {
-    const users = [];
-    for (let i = 0; i < 5; i++) {
-        const user = {"id": String(i+1), "name": "ユーザー" + String(i+1)};
-        users.push(user);
+    } catch (err) {
+        console.error(err);
+        return [];
     }
-    return users;
 }

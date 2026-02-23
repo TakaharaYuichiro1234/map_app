@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>簡易マニュアル</title>
+
+    <link rel="stylesheet" href="<?= BASE_PATH ?>/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_PATH ?>/css/manual.css">
+</head>
+
+<body>
+    <header class="header-type3">
+        <button class="prev-button" id="back" onclick="location.href='<?= BASE_PATH ?>'">
+            <a class="lessthan"></a>
+        </button>
+        <span class="header-title" id="header-title">簡易マニュアル</span>
+    </header>
+
+    <main>
+        <button class="page-top" id="to-page-top"><span></span>TOP</button>
+
+        <section id="outline">
+            <h1>目次</h1>
+            <ul class="outline-list">
+                <li><a href="#about">アプリの概要</a></li>
+                <li><a href="#attention">注意事項</a></li>
+                <li><a href="#basic">基本操作 (スポット登録・評価)</a></li>
+                <li><a href="#user-change">ユーザー切り替え</a></li>
+                <li><a href="#dummy-data">ダミーデータ作成</a></li>
+                <li><a href="#remove-data">データ削除</a></li>
+            </ul>
+        </section>
+
+        <section id="about">
+            <h1>アプリの概要</h1>
+            <h2>トップ画面の構成</h2>
+            <p><img src="resources/manual/top_screen.png"></p>
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>説明</th>
+                </tr>
+                <tr>
+                    <td>3Dマーカー</td>
+                    <td>登録済みの危険スポットです。マーカーの高さは危険度の評価値を表します。</td>
+                </tr>
+                <tr>
+                    <td>現在地マーカー</td>
+                    <td>現在地を表します。端末の位置情報が取得できる時に表示されます。</td>
+                </tr>
+                <tr>
+                    <td>表示切り替えボタン</td>
+                    <td>地図とリストの表示切り替えができます。</td>
+                </tr>
+                <tr>
+                    <td>メニューボタン</td>
+                    <td>メニュー項目が表示されます。</td>
+                </tr>
+                <tr>
+                    <td>ズームボタン</td>
+                    <td>地図を拡大/縮小することができます。</td>
+                </tr>
+                <tr>
+                    <td>現在地ボタン</td>
+                    <td>地図の中心を現在地に移動します。端末の位置情報が取得できる時に有効です。</td>
+                </tr>
+                <tr>
+                    <td>新規ボタン</td>
+                    <td>危険スポットを新規登録します。</td>
+                </tr>
+            </table>
+
+            <h2>3Dマーカーとは</h2>
+            <p>3Dマーカーは、危険スポットの位置と危険度の評価状況を表します。危険度の評価状況によって、以下のように変化します。</p>
+            <p><img src="resources/manual/legend_marker.png"></p>
+
+            <h2>地図データについて</h2>
+            <p>国土地理院の<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>を利用しています。</p>
+        </section>
+
+        <section id="attention">
+            <h1>注意事項</h1>
+            <h2>位置情報や写真などのデータについて</h2>
+            <p>本アプリでは、位置情報や撮影した写真などのデータを、端末内のローカルストレージ(window.localStorage)に保存しています。</p>
+            <p>ローカルストレージは、端末内に情報が残り続ける特性があるため、セキュリティ面やプライバシー保護の観点から、不要になった場合には削除することを推奨します。</p>
+            <p>データの削除方法については、<a href="#remove-data">データ削除</a>の項を参照してください。</p>
+
+            <h2>データ容量について</h2>
+            <p>前述のとおり、本アプリでは端末内のローカルストレージにデータを保存しています。</p>
+            <p>ローカルストレージに保存できるデータ容量は、使用環境によっても異なりますが数MB程度です。</p>
+            <p>（このため、本アプリではデータ容量を減らすために、写真の解像度を低くしています。）</p>
+            <p>大量のデータを保存して保存容量の上限を超えた場合、新たなデータが正常に保存できなくなります。</p>
+            <p>動作の安定性を保つため、不要なデータは定期的に削除することを推奨します。</p>
+            <p>データの削除方法については、<a href="#remove-data">データ削除</a>の項を参照してください。</p>
+        </section>
+
+        <section id="basic">
+            <h1>基本操作 (スポット登録・評価)</h1>
+            <p>本アプリの最も基本的な使い方は、危険スポットを登録することと、登録されたスポットの危険度を評価することです。以下に、操作手順を示します。</p>
+
+            <h2>新規危険スポットの登録</h2>
+            <ol class="description-list">
+                <li>トップ画面左下の「新規」(新規登録ボタン)をタップ</li>
+                <p><img src="resources/manual/new_button.png"></p>
+                <li>地図の中央の「＋」マークを危険スポットの位置に合わせて、「決定」をタップ</li>
+                <p><img src="resources/manual/decision_spot.png"></p>
+                <li>新規スポット登録画面で必要事項を記入して、右上の「登録」をタップ</li>
+                <p><img src="resources/manual/register_spot.png"></p>
+            </ol>
+
+            <h2>危険度評価</h2>
+            <ol class="description-list">
+                <li>地図上の3Dマーカーをタップし、その下に表示されるポップアップをタップ</li>
+                <p><img src="resources/manual/marker_and_popup.png"></p>
+                <li>危険度を評価し、「評価結果を登録する」をタップ</li>
+                <p><img src="resources/manual/evaluating.png"></p>
+            </ol>
+        </section>
+
+        <section id="user-change">
+            <h1>ユーザー切り替え</h1>
+            <p>前述の通り、本アプリではデータをローカルストレージに保存しているため、他のユーザーが登録したスポットの閲覧や評価などができません。複数ユーザーでの動作を擬似的に体感するため、ユーザー切り替え機能を実装しています。ユーザーの切り替え方法は以下の通りです。</p>
+            <ol class="description-list">
+                <li>トップ画面右上のメニューボタンをタップ</li>
+                <li>「ユーザー切り替え」をタップ</li>
+                <p><img src="resources/manual/menu_list.png"></p>
+                <li>「変更後のユーザー」のコンボボックスでユーザーを選択し、画面右上の「決定」をタップ</li>
+                <p><img src="resources/manual/select_user.png"></p>
+            </ol>
+        </section>
+
+        <section id="dummy-data">
+            <h1>ダミーデータ作成</h1>
+            <p>本アプリでは、円滑にアプリの動作テストを実施していただくため、危険スポットのデータをダミーで作成することができます。ダミーデータの作成方法は以下の通りです。</p>
+            <ol class="description-list">
+                <li>トップ画面右上のメニューボタンをタップ</li>
+                <li>「ダミーデータ作成」をタップ</li>
+                <p><img src="resources/manual/menu_list.png"></p>
+            </ol>
+        </section>
+
+        <section id="remove-data">
+            <h1>データ削除</h1>
+            <p>以下の操作により、個別もしくは一括でデータを削除できます。</p>
+            <p>削除したデータは元に戻せませんのでご注意ください。</p>
+
+            <h2>危険スポットの削除</h2>
+            <p>危険スポットは登録したユーザーだけが削除できます。</p>
+            <p>この操作を実行すると、このスポットに登録されている写真などのデータも削除されます。</p>
+            <ol class="description-list">
+                <li>地図上で、対象の3Dマーカーをタップし、表示されたポップアップをタップ</li>
+                <li>スポット詳細画面内にある「このスポットを削除」ボタンをタップ（自分が登録したスポットではない場合、このボタンは表示されません）</li>
+                <p><img src="resources/manual/remove_spot.png"></p>
+            </ol>
+
+            <h2>危険スポットの写真削除</h2>
+            <p>危険スポットの写真は、その危険スポットを登録したユーザーだけが削除できます。</p>
+            <ol class="description-list">
+                <li>地図上で、対象の3Dマーカーをタップし、表示されたポップアップをタップ</li>
+                <li>スポット詳細画面内にある写真をタップ</li>
+                <li>写真の拡大画面で、「この写真を削除」をタップ（自分が登録したスポットではない場合、このボタンは表示されません）</li>
+            </ol>
+
+            <h2>一括削除</h2>
+            <p>すべてのデータを一括削除することができます。</p>
+            <ol class="description-list">
+                <li>トップ画面右上のメニューボタンをタップ</li>
+                <li>「すべてのデータを消去」をタップ</li>
+            </ol>
+        </section>
+    </main>
+
+
+    <script src="<?= BASE_PATH ?>/js/app.js"></script>
+    <script src="<?= BASE_PATH ?>/js/utils/to-page-top.js"></script>
+    <script>
+        initToPageTop('to-page-top');
+    </script>
+</body>
+
+</html>

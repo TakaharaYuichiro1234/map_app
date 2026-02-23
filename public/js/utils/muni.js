@@ -19,7 +19,7 @@
     async function loadMunicipalityCSV() {
         // 総務省 全国地方公共団体コード
         // https://www.soumu.go.jp/denshijiti/code.html
-        const res = await fetch("resources/data/municipality.csv");
+        const res = await fetch(`${BASE_PATH}/resources/data/municipality.csv`);
         const text = await res.text();
         const lines = text.split("\n");
         const dict = {};
