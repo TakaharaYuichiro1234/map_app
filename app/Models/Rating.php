@@ -25,6 +25,33 @@ class Rating
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function find($spotId = null, $uuid = null)
+    {
+        // $sql = "SELECT * FROM ratings WHERE 1=1";
+        $sql =
+            'SELECT r.id, r.spot_id, u.uuid, r.date, r.rating, r.comment, r.created_at, r.updated_at 
+             FROM ratings r 
+             LEFT JOIN users u 
+             ON r.user_id = u.id
+             WHERE 1=1';
+        $params = [];
+
+        if ($spotId !== null) {
+            $sql .= " AND r.spot_id = ?";
+            $params[] = $spotId;
+        }
+
+        if ($uuid !== null) {
+            $sql .= " AND u.uuid = ?";
+            $params[] = $uuid;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function findById($id): ?array
     {
         // $stmt = $this->pdo->prepare(

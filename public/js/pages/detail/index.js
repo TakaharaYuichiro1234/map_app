@@ -5,7 +5,19 @@
 // -----------------------------
 // 初期設定
 // -----------------------------
-const mCurrentPositionStatus = { position: null, lastUpdate: null };
+import { getSpotById, updateSpot } from '../../services/spot-service.js';
+import { savePhotos } from '../../services/photo-service.js';
+import { cameraUsing } from '../../utils/photo/camera-using.js';
+import { initPhotoSelector, handlePhotoSelect } from '../../utils/photo/photo-selector.js';
+import { initToPageTop } from '../../utils/to-page-top.js';
+import { initViewMain } from './view-main.js';
+import { initViewHistory } from './view-history.js';
+import { showPhoto, setMainPhoto, removePhoto, closePhotoModal } from './view-photo.js';
+import { setRatingInputsViewing } from './view-main.js';
+import { back, submitRating, remove } from './actions.js';
+import { calDistance } from '../../utils/math.js';
+
+export const mCurrentPositionStatus = { position: null, lastUpdate: null };
 
 document.addEventListener("DOMContentLoaded", async () => {
     await init();
@@ -169,10 +181,10 @@ function initMonitoringCurrentPosition() {
     }, 5000);
 }
 
-function showDistanceComment(spotPosition = null) {
+export function showDistanceComment(spotPosition = null) {
     let distance = null;
     if (mCurrentPositionStatus.position && spotPosition) {
-        distance = MathModule.distance(
+        distance = calDistance(
             mCurrentPositionStatus.position.lat,
             mCurrentPositionStatus.position.lng,
             spotPosition.lat,

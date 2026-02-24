@@ -5,7 +5,18 @@
 // -----------------------------
 // 初期設定
 // -----------------------------
-let mapInstance;
+import { BASE_PATH, STORAGE_IS_NOT_FIRST_START, NEAR_DISTANCE } from '../../config.js';
+import { formatDate } from '../../utils/date-utils.js';
+import { safeSetItem } from '../../services/local-storage-service.js';
+import { saveMapCenterZoom, saveNewSpotPos } from '../../services/map-service.js';
+import { loadSpots } from '../../services/spot-service.js';
+import { getSpotRatingStats, isRated } from '../../services/rating-service.js';
+import { MapModule } from './map-module.js';
+import { ListModule } from './list-module.js';
+import { openModal, closeModal, toManualPage } from './actions.js';
+import { menuButtonListener } from './menu.js';
+
+export let mapInstance;
 let listInstance;
 let isSelectMode = false;
 
@@ -35,7 +46,7 @@ document.addEventListener("change-view-to-map", (e) => {
 });
 
 // -----------------------------
-// 初期設定用の関数
+// 初期設定用のプライベート関数
 // -----------------------------
 async function init() {
     if (!localStorage.getItem(STORAGE_IS_NOT_FIRST_START)) {
@@ -75,7 +86,7 @@ async function init() {
 function buttonListener() {
     // 地図表示/リスト表示の切り替え 
     document.getElementById("view-switch-check").addEventListener("change", function () {
-        isMap = this.checked;
+        const isMap = this.checked;
         document.getElementById("view-map").style.display = isMap ? "block" : "none";
         document.getElementById("view-list").style.display = isMap ? "none" : "block";
     });
@@ -150,18 +161,4 @@ function creatingNewSpotListener() {
         newBtn.textContent = "新規";
         newBtn.style.backgroundColor = "#0078ff"
     });
-}
-
-// -----------------------------
-// スプラッシュ画面(モーダル画面)
-// -----------------------------
-function openModal() {
-    const modal = document.querySelector(".modal");
-    modal.classList.remove("hidden");
-}
-
-function closeModal() {
-    const modal = document.querySelector(".modal");
-    modal.classList.add("hidden");
-    selectedPhotoIndex = null;
 }

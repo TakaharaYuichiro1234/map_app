@@ -1,4 +1,7 @@
-class MapModule {
+import { DEFAULT_MAP_CENTER_ZOOM, STORAGE_MAP_CENTER_ZOOM, IS_DEBUG, OFFSET_LAT, OFFSET_LNG } from '../../config.js';
+import { saveMapCenterZoom } from '../../services/map-service.js';
+
+export class MapModule {
     constructor() {
         this.mapElementId = "map";
         this.canvasId = "overlay-canvas";
@@ -13,9 +16,7 @@ class MapModule {
         this.canvas = null;
         this.ctx = null;
         this.spots = [];
-
         this.ratingStats = [];
-
 
         this.barHitAreas = [];
         this.activePopup = null;

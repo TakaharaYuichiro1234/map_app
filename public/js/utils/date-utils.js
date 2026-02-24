@@ -3,7 +3,7 @@
 // *****************************
 
 // Date型のdateを、集計や比較用に「yy-mm-dd」形式の文字列に変換
-function formatDateKey(date) {
+export function formatDateKey(date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
@@ -11,7 +11,7 @@ function formatDateKey(date) {
 }
 
 // Date型のdateを、チャートのラベル用の文字列に変換
-function formatDateLabel(date) {
+export function formatDateLabel(date) {
     const m = date.getMonth() + 1;
     const d = date.getDate();
     const day = date.getDay();
@@ -20,7 +20,7 @@ function formatDateLabel(date) {
 }
 
 // Date型のdateを、詳細画面の表示用に「yyyy-mm-dd」形式の文字列に変換
-function formatDateTime(date) {
+export function formatDateTime(date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
@@ -32,7 +32,7 @@ function formatDateTime(date) {
     return `${y}-${m}-${d} ${h}:${min}:${s}`;
 }
 
-function formatDate(date) {
+export function formatDate(date) {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
@@ -41,7 +41,7 @@ function formatDate(date) {
 }
 
 // 同一の日付かどうかの判定
-function isSameDay(date1, date2) {
+export function isSameDay(date1, date2) {
     return (
         date1.getFullYear() === date2.getFullYear() &&
         date1.getMonth() === date2.getMonth() &&

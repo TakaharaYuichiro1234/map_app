@@ -1,69 +1,11 @@
-// async function initViewHistory(id) {
-//     const ratings = await getRatingsBySpotId(id);
+import { MAX_RATING } from '../../config.js';
+import { getUserByUuid } from '../../services/user-service.js';
+import { getRatings, removeRating } from '../../services/rating-service.js';
 
-//     const domHistory = document.getElementById('history-container');
-//     domHistory.innerHTML = '';
-//     if (ratings.length === 0) {
-//         domHistory.innerHTML = "<p>まだ評価がありません</p>";
-//         return;
-//     }
-
-//     ratings.sort((a, b) => {
-//         return new Date(b.createdAt) - new Date(a.createdAt);
-//     });
-
-//     for(const r of ratings) {
-//         const date = formatDateKey(new Date(r.createdAt));
-//         const targetUser = await getUserByUuid(r.uuid);
-//         const userName = targetUser.name;
-
-//         const isMyRating = user? (r.uuid === user['uuid']): false;
-//         const hide = isMyRating ? "": "hide";
-
-//         const colorDots = `<span class="history-dot level${r.rating}"></span>`;
-//         const grayDots = `<span class="history-dot"></span>`;
-//         const dots = colorDots.repeat(r.rating) + grayDots.repeat(MAX_RATING - r.rating);
-
-//         const div = document.createElement("div");
-//         div.className = "history-content";
-//         div.innerHTML = `
-//             <div class="history-content-header">
-//                 <div class="history-content-header-left">
-//                     <p class="history-date">${date}</p>
-//                     <p class="history-user">${userName}</p>
-//                 </div>
-//                 <button 
-//                     class="history-remove ${hide}" 
-//                     id="history-remove_${r.id}">
-//                     削除
-//                 </button>
-//             </div>
-//             <div class="history-rating">
-//                 ${dots}
-//                 <span class="history-value">${'危険度の評価: ' + r.rating}</span>
-//             </div>
-//             <div class="history-content-main">
-//                 <p class="history-comment">${r.comment}</p>
-//             </div>
-//         `;
-//         domHistory.appendChild(div);
-
-//         document.getElementById(`history-remove_${r.id}`).addEventListener('click', () => {
-//             if (!confirm('この評価を削除してもよろしいですか？')) return;
-//             if (!removeRating(r.id)) {
-//                 alert('削除に失敗しました。');
-//                 return;
-//             }
-//             initViewHistory(id);
-//         });
-//     }
-// }
-
-async function initViewHistory() {
-    const ratings = await getRatingsBySpotId(id);
-
+export async function initViewHistory() {
+    const ratings = await getRatings({ spotId: id });
     const domHistory = document.getElementById('history-container');
-    domHistory.textContent = ''; // innerHTML使わない
+    domHistory.textContent = '';
 
     if (ratings.length === 0) {
         const p = document.createElement('p');

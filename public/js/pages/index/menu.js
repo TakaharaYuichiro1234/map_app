@@ -1,4 +1,7 @@
-function menuButtonListener() {
+import { login, logout, openModal, toManualPage } from './actions.js';
+import { createDummySpots } from './dummy.js';
+
+export function menuButtonListener() {
     const menuBtn = document.getElementById("menu-btn");
     const menuPanel = document.getElementById("menu-panel");
 
@@ -17,9 +20,9 @@ function menuButtonListener() {
         item.addEventListener("click", (e) => {
             const action = e.target.dataset.action;
             if (action === 'login') {
-                window.location.href = `${BASE_PATH}/show_login`;
+                login();
             } else if (action === 'logout') {
-                document.getElementById('logout').submit();
+                logout();
             } else if (action === 'dummy') {
                 createDummySpots();
             } else if (action === 'manual') {
@@ -35,6 +38,3 @@ function menuButtonListener() {
     });
 }
 
-function toManualPage() {
-    location.href = `${BASE_PATH}/manuals`;
-}

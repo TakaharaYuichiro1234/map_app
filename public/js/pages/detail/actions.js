@@ -1,8 +1,15 @@
-function back() {
+import { BASE_PATH, NEAR_DISTANCE } from '../../config.js';
+import { getSpotById, removeSpot } from '../../services/spot-service.js';
+import { isRated, saveRating } from '../../services/rating-service.js';
+import { formatDate } from '../../utils/date-utils.js';
+import { mCurrentPositionStatus } from './index.js';
+import { calDistance } from '../../utils/math.js';
+
+export function back() {
     location.href = `${BASE_PATH}/spots?highlight=${id}`;
 }
 
-async function remove() {
+export async function remove() {
     const spot = await getSpotById(id);
     const result = window.confirm(`このスポット「${spot.name}」を削除してもよろしいですか？\nスポットを削除すると写真や評価データも削除されます。`);
     if (result) {
@@ -21,11 +28,11 @@ async function remove() {
     }
 }
 
-async function submitRating() {
+export async function submitRating() {
     const spot = getSpotById(id);
     let distance = null;
     if (mCurrentPositionStatus.position) {
-        distance = MathModule.distance(
+        distance = calDistance(
             mCurrentPositionStatus.position.lat,
             mCurrentPositionStatus.position.lng,
             spot.lat,

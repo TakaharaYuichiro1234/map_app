@@ -94,22 +94,8 @@
     </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <script src="<?= BASE_PATH ?>/js/app.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/date-utils.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/math.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/muni.js"></script>
-
-    <script src="<?= BASE_PATH ?>/js/services/rating-service.js"></script>
-    <script src="<?= BASE_PATH ?>/js/services/photo-service.js"></script>
-    <script src="<?= BASE_PATH ?>/js/services/spot-service.js"></script>
-    <script src="<?= BASE_PATH ?>/js/services/user-service.js"></script>
-
-    <script src="<?= BASE_PATH ?>/js/pages/index/list-module.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/index/map-module.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/index/menu.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/index/dummy.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/index/index.js"></script>
+    
+    <script type="module" src="<?= BASE_PATH ?>/js/pages/index/index.js"></script>
 </body>
 
 </html>

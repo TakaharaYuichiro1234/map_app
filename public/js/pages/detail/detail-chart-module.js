@@ -1,4 +1,6 @@
-class DetailChartModule {
+import { getDailyRatingEachUser, getDailyRating } from '../../services/rating-service.js';
+
+export class DetailChartModule {
     constructor(chartDomId, spotId, userId = null) {
         this.chartDomId = chartDomId;
         this.spotId = spotId;

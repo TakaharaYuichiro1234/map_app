@@ -172,12 +172,7 @@
         </section>
     </main>
 
-
-    <script src="<?= BASE_PATH ?>/js/app.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/to-page-top.js"></script>
-    <script>
-        initToPageTop('to-page-top');
-    </script>
+    <script type="module" src="<?= BASE_PATH ?>/js/pages/manual/index.js"></script>
 </body>
 
 </html>

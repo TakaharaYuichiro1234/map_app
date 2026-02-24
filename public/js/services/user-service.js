@@ -1,7 +1,9 @@
 // *****************************
 // ユーザーデータ管理
 // *****************************
-async function getUserByUuid(uuid) {
+import { BASE_PATH } from '../config.js';
+
+export async function getUserByUuid(uuid) {
     try {
         const url = `${BASE_PATH}/api/users/${uuid}`
         const res = await fetch(url, {
@@ -30,7 +32,7 @@ async function getUserByUuid(uuid) {
     }
 }
 
-async function getUsers() {
+export async function getUsers() {
     try {
         const url = `${BASE_PATH}/api/users`
         const res = await fetch(url, {

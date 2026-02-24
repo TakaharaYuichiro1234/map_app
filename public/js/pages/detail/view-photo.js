@@ -1,6 +1,9 @@
+import { BASE_PATH } from '../../config.js';
+import { getPhotosBySpotId, removePhotoById, swapMainPhoto } from '../../services/photo-service.js';
+
 let mSelectedPhotoId = null;
 
-async function showPhoto() {
+export async function showPhoto() {
     const domPhotoPreviewArea = document.getElementById("photo-preview-area");
     domPhotoPreviewArea.innerHTML = "";
 
@@ -23,7 +26,7 @@ async function showPhoto() {
     });
 }
 
-async function removePhoto() {
+export async function removePhoto() {
     if (!confirm("この写真を削除しますか？")) return;
 
     const csrfToken = document
@@ -35,7 +38,7 @@ async function removePhoto() {
     await showPhoto();
 }
 
-async function setMainPhoto() {
+export async function setMainPhoto() {
     const csrfToken = document
         .querySelector('meta[name="csrf-token"]')
         ?.getAttribute('content');
@@ -43,6 +46,12 @@ async function setMainPhoto() {
     await swapMainPhoto(csrfToken, id, mSelectedPhotoId);
     closePhotoModal();
     await showPhoto();
+}
+
+export function closePhotoModal() {
+    const modal = document.querySelector(".modal");
+    modal.classList.add("hidden");
+    mSelectedPhotoId = null;
 }
 
 function openPhotoModal(photo) {
@@ -57,10 +66,4 @@ function openPhotoModal(photo) {
     };
 
     modal.classList.remove("hidden");
-}
-
-function closePhotoModal() {
-    const modal = document.querySelector(".modal");
-    modal.classList.add("hidden");
-    mSelectedPhotoId = null;
 }

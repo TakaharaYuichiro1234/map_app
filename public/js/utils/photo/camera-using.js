@@ -1,11 +1,11 @@
-async function cameraUsing(photoSelectBtnElementId) {
+export async function cameraUsing(photoSelectBtnElementId) {
     const canUseCamera = await checkCameraAvailable();
     const photoSelectBtn = document.getElementById(photoSelectBtnElementId);
     photoSelectBtn.style.display = canUseCamera ? "block" : "none";
 }
 
 // カメラが使えるか判定
-async function checkCameraAvailable() {
+export async function checkCameraAvailable() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return false;
 
     try {

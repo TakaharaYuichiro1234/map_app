@@ -1,4 +1,6 @@
-class DetailMapModule {
+import { STORAGE_MAP_CENTER_ZOOM, IS_DEBUG, OFFSET_LAT, OFFSET_LNG } from '../../config.js';
+
+export class DetailMapModule {
     constructor() {
         this.map = null;
         this.latestCurrentPosition = null;

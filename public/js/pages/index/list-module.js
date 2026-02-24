@@ -1,4 +1,9 @@
-class ListModule {
+import { BASE_PATH, NEAR_DISTANCE } from '../../config.js';
+import { calDistance } from '../../utils/math.js';
+import { getSpotRatingStats } from '../../services/rating-service.js';
+import { getMainPhoto } from '../../services/photo-service.js';
+
+export class ListModule {
     constructor() {
         this.listDom = document.getElementById("list");
         this.spots = [];
@@ -61,7 +66,7 @@ class ListModule {
             spots = spots.map(s => {
                 let distance = null;
                 if (currentPosition) {
-                    distance = MathModule.distance(
+                    distance = calDistance(
                         currentPosition.lat,
                         currentPosition.lng,
                         s.lat,

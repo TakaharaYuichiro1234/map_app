@@ -1,4 +1,11 @@
-function showPhoto() {
+import { BASE_PATH } from '../../config.js';
+import { saveSpot } from '../../services/spot-service.js';
+import { savePhotos } from '../../services/photo-service.js';
+import { photoList, address, newSpotPos } from './index.js';
+
+let selectedPhotoIndex = null;
+
+export function showPhoto() {
     const domPhotoPreviewArea = document.getElementById("photo-preview-area");
     domPhotoPreviewArea.innerHTML = "";
 
@@ -15,7 +22,7 @@ function showPhoto() {
     }
 }
 
-function removePhoto() {
+export function removePhoto() {
     if (!confirm("この写真を削除しますか？")) return;
 
     photoList.splice(selectedPhotoIndex, 1);
@@ -23,7 +30,7 @@ function removePhoto() {
     showPhoto();
 }
 
-function setMainPhoto() {
+export function setMainPhoto() {
     if (selectedPhotoIndex >= 1) {
         [photoList[0], photoList[selectedPhotoIndex]] = [photoList[selectedPhotoIndex], photoList[0]];
     }
@@ -39,13 +46,13 @@ function openPhotoModal(photo) {
     modal.classList.remove("hidden");
 }
 
-function closePhotoModal() {
+export function closePhotoModal() {
     const modal = document.querySelector(".modal");
     modal.classList.add("hidden");
     selectedPhotoIndex = null;
 }
 
-async function registerSpot() {
+export async function registerSpot() {
     const form = document.getElementById('store-spot-form');
     const formData = new FormData(form);
     const spotName = formData.get('name').trim();

@@ -1,7 +1,10 @@
 // *****************************
 // スポットデータ管理
 // *****************************
-async function loadSpots() {
+import { BASE_PATH, STORAGE_SPOT_NUMBER } from '../config.js';
+import { safeSetItem } from './local-storage-service.js';
+
+export async function loadSpots() {
     try {
         const url = `${BASE_PATH}/api/spots`
         const res = await fetch(url, {
@@ -38,7 +41,7 @@ async function loadSpots() {
     }
 }
 
-async function saveSpot(csrfToken, name, description, lat, lng, address) {
+export async function saveSpot(csrfToken, name, description, lat, lng, address) {
     const formData = new FormData();
     formData.append('csrf_token', csrfToken);
     formData.append('name', name);
@@ -70,7 +73,7 @@ async function saveSpot(csrfToken, name, description, lat, lng, address) {
     }
 }
 
-async function getSpotById(id) {
+export async function getSpotById(id) {
     try {
         const url = `${BASE_PATH}/api/spots/${id}`
         const res = await fetch(url, {
@@ -105,7 +108,7 @@ async function getSpotById(id) {
     }
 }
 
-async function updateSpot(csrfToken, targetId, data) {
+export async function updateSpot(csrfToken, targetId, data) {
     const formData = new FormData();
     formData.append('csrf_token', csrfToken);
     formData.append('id', targetId);
@@ -139,7 +142,7 @@ async function updateSpot(csrfToken, targetId, data) {
     }
 }
 
-async function removeSpot(csrfToken, targetId) {
+export async function removeSpot(csrfToken, targetId) {
     const formData = new FormData();
     formData.append('csrf_token', csrfToken);
     formData.append('id', targetId);
@@ -168,7 +171,7 @@ async function removeSpot(csrfToken, targetId) {
     }
 }
 
-function getSpotNumber() {
+export function getSpotNumber() {
     const numberText = localStorage.getItem(STORAGE_SPOT_NUMBER);
     let number = 1;
     if (numberText) {

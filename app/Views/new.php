@@ -72,18 +72,7 @@
         const isAdmin = <?= json_encode($isAdmin, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
     </script>
 
-    <script src="<?= BASE_PATH ?>/js/app.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/muni.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/photo/camera-using.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/photo/photo-selector.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/photo/photo-uploader.js"></script>
-
-    <script src="<?= BASE_PATH ?>/js/services/photo-service.js"></script>
-    <script src="<?= BASE_PATH ?>/js/services/spot-service.js"></script>
-    <script src="<?= BASE_PATH ?>/js/services/user-service.js"></script>
-
-    <script src="<?= BASE_PATH ?>/js/pages/new/actions.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/new/index.js"></script>
+    <script type="module" src="<?= BASE_PATH ?>/js/pages/new/index.js"></script>
 </body>
 
 </html>

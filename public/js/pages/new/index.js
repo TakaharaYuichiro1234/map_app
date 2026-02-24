@@ -1,11 +1,16 @@
 // *****************************
 // 新規スポット登録ページの入り口
 // *****************************
+import { STORAGE_NEW_SPOT_POS } from '../../config.js';
+import { cameraUsing } from '../../utils/photo/camera-using.js';
+import { MuniModule } from '../../utils/muni-module.js';
+import { initPhotoSelector, handlePhotoSelect } from '../../utils/photo/photo-selector.js';
+import { getSpotNumber } from '../../services/spot-service.js';
+import { showPhoto, registerSpot, closePhotoModal, removePhoto, setMainPhoto } from './actions.js';
 
-let photoList = [];
-let address = "";
-let newSpotPos = null;
-let selectedPhotoIndex = null;
+export let photoList = [];
+export let address = "";
+export let newSpotPos = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initPhotoProcess();
@@ -50,11 +55,13 @@ async function autofillSpotName() {
     localStorage.removeItem(STORAGE_NEW_SPOT_POS);
 
     // スポット名を自動入力
+    const muni = new MuniModule();
+    await muni.init();
     const input = document.getElementById("spotName");
     input.disabled = true;
     input.placeholder = "住所を取得中…";
 
-    const addressData = await MuniModule.reverseGeocode(newSpotPos.lat, newSpotPos.lng);
+    const addressData = await muni.reverseGeocode(newSpotPos.lat, newSpotPos.lng);
     if (addressData) {
         address = addressData.pref + addressData.city + addressData.region;
         input.value = addressData.region ? `${addressData.region}付近` : `危険スポット#${getSpotNumber()}`;

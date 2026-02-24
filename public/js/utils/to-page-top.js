@@ -4,7 +4,7 @@
 
 let hideTimer = null;
 
-function initToPageTop(buttonElementId) {
+export function initToPageTop(buttonElementId) {
     const button = document.getElementById(buttonElementId);
 
     button.addEventListener('click', () => {

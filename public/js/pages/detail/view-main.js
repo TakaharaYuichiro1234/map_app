@@ -1,6 +1,14 @@
+import { NEAR_DISTANCE } from '../../config.js';
+import { formatDate, formatDateTime } from '../../utils/date-utils.js';
+import { getUserByUuid } from '../../services/user-service.js';
+import { getSpotRatingStats, isRated } from '../../services/rating-service.js';
+import { DetailMapModule } from './detail-map-module.js';
+import { DetailChartModule } from './detail-chart-module.js';
+import { mCurrentPositionStatus, showDistanceComment } from './index.js';
+
 let mExistsMyRatingToday = false; // 今日、自分がこのスポットを評価済みならtrue
 
-async function initViewMain(isOwner, spot) {
+export async function initViewMain(isOwner, spot) {
     mExistsMyRatingToday = user ? await isRated(spot.id, user['uuid'], formatDate(new Date())) : false;
     document.getElementById("header-title").innerHTML = spot.name;
     document.getElementById("photo-btn-container").style.display = isOwner ? "flex" : "none";
@@ -18,7 +26,7 @@ function initRatingBlock() {
     setRatingInputsViewing();
 }
 
-function setRatingInputsViewing(distance = null) {
+export function setRatingInputsViewing(distance = null) {
     const domRatingInputsHeader = document.getElementById("rating-inputs-header");
     const domSubmitRating = document.getElementById("submit-rating");
 

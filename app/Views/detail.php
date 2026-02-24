@@ -158,26 +158,7 @@
     <script src="https://unpkg.com/leaflet-gesture-handling"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
-    <script src="<?= BASE_PATH ?>/js/app.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/date-utils.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/math.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/photo/camera-using.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/photo/photo-selector.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/photo/photo-uploader.js"></script>
-    <script src="<?= BASE_PATH ?>/js/utils/to-page-top.js"></script>
-
-    <script src="<?= BASE_PATH ?>/js/services/rating-service.js"></script>
-    <script src="<?= BASE_PATH ?>/js/services/photo-service.js"></script>
-    <script src="<?= BASE_PATH ?>/js/services/spot-service.js"></script>
-    <script src="<?= BASE_PATH ?>/js/services/user-service.js"></script>
-
-    <script src="<?= BASE_PATH ?>/js/pages/detail/detail-map-module.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/detail/detail-chart-module.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/detail/view-main.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/detail/view-photo.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/detail/view-history.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/detail/actions.js"></script>
-    <script src="<?= BASE_PATH ?>/js/pages/detail/index.js"></script>
+    <script type="module" src="<?= BASE_PATH ?>/js/pages/detail/index.js"></script>
 </body>
 
 </html>

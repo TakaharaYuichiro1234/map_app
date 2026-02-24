@@ -1,4 +1,4 @@
-function initPhotoSelector(
+export function initPhotoSelector(
     photoSelectBtnElementId, 
     photoInputElementId, 
     fileSelectBtnElementId, 
@@ -16,7 +16,7 @@ function initPhotoSelector(
     fileInput.addEventListener("change", onSelect);
 }
 
-async function handlePhotoSelect(
+export async function handlePhotoSelect(
     e,
     { onEach = async () => true, onComplete = async () => {} } = {}
 ) {

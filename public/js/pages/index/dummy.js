@@ -1,13 +1,21 @@
 // *****************************
 // ダミーデータ作成
 // *****************************
+import { BASE_PATH, TERM, MAX_RATING, MIN_RATING } from '../../config.js';
+import { MuniModule } from '../../utils/muni-module.js';
+import { formatDate } from '../../utils/date-utils.js';
+import { saveMapCenterZoom } from '../../services/map-service.js';
+import { getUsers } from '../../services/user-service.js';
+import { getSpotNumber, saveSpot } from '../../services/spot-service.js';
+import { saveDummyRatings } from '../../services/rating-service.js';
+import { mapInstance } from './index.js';
 
-async function createDummySpots() {
+export async function createDummySpots() {
     const TOTAL_DUMMIES = 1;
 
     const center = mapInstance.getMapCenter();
-    centerLat = center.lat;
-    centerLng = center.lng;
+    const centerLat = center.lat;
+    const centerLng = center.lng;
     const zoom = mapInstance.getMapZoom();
     saveMapCenterZoom(centerLat, centerLng, zoom);
 
@@ -18,13 +26,15 @@ async function createDummySpots() {
     const currentUserUuid = user['uuid'];
     const allUsers = await getUsers();
     const userUuidAll = allUsers.map(u => u.uuid);
+    const muni = new MuniModule();
+    await muni.init();
 
     for (let i = 0; i < TOTAL_DUMMIES; i++) {
         const name = `ダミースポット#${getSpotNumber()}`;
         const description = "";
         const lat = (Math.random() - 0.5) * rangeLat + centerLat;
         const lng = (Math.random() - 0.5) * rangeLng + centerLng;
-        const addData = await MuniModule.reverseGeocode(lat, lng);
+        const addData = await muni.reverseGeocode(lat, lng);
         const address = addData ? addData.pref + addData.city + addData.region : "住所が取得できませんでした";
 
         const spotId = await saveSpot(csrfToken, name, description, lat, lng, address);
@@ -86,7 +96,7 @@ function dummyRatingsRandom(total) {
     let ratings = [];
     for (let i = 0; i < total; i++) {
         // MAXとMINの範囲外のときはnull (あえて欠損値を作っている)
-        r = Math.floor(Math.random() * MAX_RATING * 4) + 1;
+        const r = Math.floor(Math.random() * MAX_RATING * 4) + 1;
         if (r <= MAX_RATING && r >= MIN_RATING) {
             ratings.push(r);
         } else {

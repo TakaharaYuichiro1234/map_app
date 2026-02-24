@@ -1,7 +1,10 @@
 // *****************************
 // 評価(rating)データ管理
 // *****************************
-async function loadRatings() {
+import { BASE_PATH, TERM, RECENT_DAYS, MAX_RATING, MIN_RATING } from '../config.js';
+import { formatDate } from '../utils/date-utils.js';
+
+export async function loadRatings() {
     try {
         const url = `${BASE_PATH}/api/ratings`
         const res = await fetch(url, {
@@ -34,7 +37,7 @@ async function loadRatings() {
     }
 }
 
-async function saveRating(csrfToken, spotId, date, rating, comment, uuid = "") {    // uuid=""のときはDB側でSESSIONのuserを取得
+export async function saveRating(csrfToken, spotId, date, rating, comment, uuid = "") {    // uuid=""のときはDB側でSESSIONのuserを取得
     const formData = new FormData();
     formData.append('csrf_token', csrfToken);
     formData.append('spot_id', spotId);
@@ -51,7 +54,7 @@ async function saveRating(csrfToken, spotId, date, rating, comment, uuid = "") {
             credentials: 'same-origin', // セッション / CSRF用
         });
         if (!res.ok) throw new Error('通信エラー');
-        
+
         const result = await res.json();
         if (!result.success) throw new Error('書き込みエラー');
         return true;
@@ -62,7 +65,7 @@ async function saveRating(csrfToken, spotId, date, rating, comment, uuid = "") {
     }
 }
 
-async function saveDummyRatings(csrfToken, spotId, ratingData) {
+export async function saveDummyRatings(csrfToken, spotId, ratingData) {
     for (const ratingDatum of ratingData) {
         const ret = await saveRating(csrfToken, spotId, ratingDatum.date, ratingDatum.rating, ratingDatum.comment, ratingDatum.userUuid);
         if (!ret) {
@@ -72,7 +75,7 @@ async function saveDummyRatings(csrfToken, spotId, ratingData) {
     return true;
 }
 
-async function removeRating(csrfToken, targetId) {
+export async function removeRating(csrfToken, targetId) {
     const formData = new FormData();
     formData.append('csrf_token', csrfToken);
     formData.append('id', targetId);
@@ -96,7 +99,7 @@ async function removeRating(csrfToken, targetId) {
     }
 }
 
-async function isRated(spotId, uuid, date) {
+export async function isRated(spotId, uuid, date) {
     try {
         const url = `${BASE_PATH}/api/ratings/is_rated/${spotId}/${uuid}/${date}`;
         const res = await fetch(url, {
@@ -117,20 +120,23 @@ async function isRated(spotId, uuid, date) {
     }
 }
 
-async function getRatingsBySpotId(spotId) {
+export async function getRatings({ spotId = null, uuid = null } = {}) {
     try {
-        const url = `${BASE_PATH}/api/ratings/get_by_spot_id/${spotId}`
+        const params = new URLSearchParams();
+        if (spotId !== null) params.append('spot_id', spotId);
+        if (uuid !== null) params.append('uuid', uuid);
+
+        const url = `${BASE_PATH}/api/ratings?${params.toString()}`;
         const res = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Accept': 'application/json'
-            }
+            headers: { 'Accept': 'application/json' }
         });
+
         if (!res.ok) throw new Error('通信エラー');
 
         const result = await res.json();
         if (!result.success) throw new Error('エラー');
-        
+
         const ratings = result.ratings.map(rating => {
             return {
                 id: rating.id,
@@ -143,6 +149,7 @@ async function getRatingsBySpotId(spotId) {
                 updatedAt: rating.updated_at,
             }
         })
+
         return ratings;
 
     } catch (err) {
@@ -151,7 +158,7 @@ async function getRatingsBySpotId(spotId) {
     }
 }
 
-async function getSpotRatingStats(spotId) {
+export async function getSpotRatingStats(spotId) {
     const dailyRating = await getDailyRating(spotId);
     const totalUsers = dailyRating.userCount;
     const { recentRating, pastRating } = calRatingTrend(dailyRating.ratings);
@@ -232,19 +239,8 @@ function leastSquares(x, y) {
     return { slope: a, intercept: b };
 }
 
-function countUniqueUserIds(data) {
-    const userIdSet = new Set();
-
-    data.forEach(datum => {
-        if (datum.userId != null) {
-            userIdSet.add(datum.userId);
-        }
-    });
-    return userIdSet.size;
-}
-
-async function getDailyRating(spotId) {
-    const list = await getRatingsBySpotId(spotId);
+export async function getDailyRating(spotId) {
+    const list = await getRatings({ spotId: spotId });
     const uniqueUserIds = getUniqueUserIds(list);
     const userCount = uniqueUserIds.size;
 
@@ -278,15 +274,13 @@ async function getDailyRating(spotId) {
     return { "days": days, "ratings": avgRatings, "userCount": userCount };
 }
 
-async function getDailyRatingEachUser(spotId, uuid) {
-    const list = await getRatingsBySpotId(spotId);
-
+export async function getDailyRatingEachUser(spotId, uuid) {
     // 31日前(=TERM+1日)から今日までの日付データの配列daysを作成
     const days = createDayArrayInTerm();
 
     // days(31日前から今日までの日付の配列)に対応する評価値の配列を、ユーザー毎に作成
-    const listEachUser = list.filter(r => r.uuid === uuid);
-    ratings = createRatingArrayInTerm(listEachUser, days);
+    const listEachUser = await getRatings({ spotId: spotId, uuid: uuid });
+    const ratings = createRatingArrayInTerm(listEachUser, days);
 
     return { "days": days, "ratings": ratings };
 }
