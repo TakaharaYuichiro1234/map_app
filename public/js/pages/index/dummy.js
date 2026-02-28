@@ -22,7 +22,7 @@ export async function createDummySpots() {
     const bounds = mapInstance.getMapBounds();
     const rangeLat = bounds.getNorthEast().lat - bounds.getSouthWest().lat;
     const rangeLng = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    // const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const currentUserUuid = user['uuid'];
     const allUsers = await getUsers();
     const userUuidAll = allUsers.map(u => u.uuid);
@@ -37,7 +37,7 @@ export async function createDummySpots() {
         const addData = await muni.reverseGeocode(lat, lng);
         const address = addData ? addData.pref + addData.city + addData.region : "住所が取得できませんでした";
 
-        const spotId = await saveSpot(csrfToken, name, description, lat, lng, address);
+        const spotId = await saveSpot(name, description, lat, lng, address);
         if (!spotId) return;
 
         const totalUsers = Math.floor(Math.random() * 3);   // 0人から5人
@@ -66,7 +66,7 @@ export async function createDummySpots() {
             }
         }
 
-        const ret = await saveDummyRatings(csrfToken, spotId, ratingData);
+        const ret = await saveDummyRatings(spotId, ratingData);
         if (!ret) return;
     }
 

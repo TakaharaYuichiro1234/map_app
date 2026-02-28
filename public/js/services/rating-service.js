@@ -2,6 +2,7 @@
 // 評価(rating)データ管理
 // *****************************
 import { BASE_PATH, TERM, RECENT_DAYS, MAX_RATING, MIN_RATING } from '../config.js';
+import { getCsrfToken } from '../utils/common.js';
 import { formatDate } from '../utils/date-utils.js';
 
 export async function loadRatings() {
@@ -37,9 +38,9 @@ export async function loadRatings() {
     }
 }
 
-export async function saveRating(csrfToken, spotId, date, rating, comment, uuid = "") {    // uuid=""のときはDB側でSESSIONのuserを取得
+export async function saveRating(spotId, date, rating, comment, uuid = "") {    // uuid=""のときはDB側でSESSIONのuserを取得
     const formData = new FormData();
-    formData.append('csrf_token', csrfToken);
+    formData.append('csrf_token', getCsrfToken());
     formData.append('spot_id', spotId);
     formData.append('date', date);
     formData.append('rating', rating);
@@ -65,9 +66,9 @@ export async function saveRating(csrfToken, spotId, date, rating, comment, uuid 
     }
 }
 
-export async function saveDummyRatings(csrfToken, spotId, ratingData) {
+export async function saveDummyRatings(spotId, ratingData) {
     for (const ratingDatum of ratingData) {
-        const ret = await saveRating(csrfToken, spotId, ratingDatum.date, ratingDatum.rating, ratingDatum.comment, ratingDatum.userUuid);
+        const ret = await saveRating(getCsrfToken(), spotId, ratingDatum.date, ratingDatum.rating, ratingDatum.comment, ratingDatum.userUuid);
         if (!ret) {
             console.error('ダミーの評価データ作成失敗');
         }
@@ -75,9 +76,9 @@ export async function saveDummyRatings(csrfToken, spotId, ratingData) {
     return true;
 }
 
-export async function removeRating(csrfToken, targetId) {
+export async function removeRating(targetId) {
     const formData = new FormData();
-    formData.append('csrf_token', csrfToken);
+    formData.append('csrf_token', getCsrfToken());
     formData.append('id', targetId);
 
     try {

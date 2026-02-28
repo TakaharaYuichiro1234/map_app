@@ -69,10 +69,10 @@ async function initPhotoProcess(isOwner) {
         fileInputElementId,
         (e) => handlePhotoSelect(e, {
             onEach: async (img) => {
-                const csrfToken = document
-                    .querySelector('meta[name="csrf-token"]')
-                    ?.getAttribute('content');
-                const ret = await savePhotos(csrfToken, id, [img]);
+                // const csrfToken = document
+                //     .querySelector('meta[name="csrf-token"]')
+                //     ?.getAttribute('content');
+                const ret = await savePhotos(id, [img]);
                 if (!ret) return false;
                 return true;
             },
@@ -159,10 +159,10 @@ function updateSpotField({
         return false;
     }
 
-    const csrfToken = document
-        .querySelector('meta[name="csrf-token"]')
-        ?.getAttribute('content');
-    const resp = updateSpot(csrfToken, spotId, { [fieldName]: value });
+    // const csrfToken = document
+    //     .querySelector('meta[name="csrf-token"]')
+    //     ?.getAttribute('content');
+    const resp = updateSpot(spotId, { [fieldName]: value });
     if (!resp) {
         alert("データの更新に失敗しました");
         return false;

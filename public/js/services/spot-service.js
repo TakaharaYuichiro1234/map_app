@@ -2,6 +2,7 @@
 // スポットデータ管理
 // *****************************
 import { BASE_PATH, STORAGE_SPOT_NUMBER } from '../config.js';
+import { getCsrfToken } from '../utils/common.js';
 import { safeSetItem } from './local-storage-service.js';
 
 export async function loadSpots() {
@@ -41,9 +42,9 @@ export async function loadSpots() {
     }
 }
 
-export async function saveSpot(csrfToken, name, description, lat, lng, address) {
+export async function saveSpot(name, description, lat, lng, address) {
     const formData = new FormData();
-    formData.append('csrf_token', csrfToken);
+    formData.append('csrf_token', getCsrfToken());
     formData.append('name', name);
     formData.append('description', description);
     formData.append('lat', lat);
@@ -108,9 +109,9 @@ export async function getSpotById(id) {
     }
 }
 
-export async function updateSpot(csrfToken, targetId, data) {
+export async function updateSpot(targetId, data) {
     const formData = new FormData();
-    formData.append('csrf_token', csrfToken);
+    formData.append('csrf_token', getCsrfToken());
     formData.append('id', targetId);
 
     for (const key in data) {
@@ -142,9 +143,9 @@ export async function updateSpot(csrfToken, targetId, data) {
     }
 }
 
-export async function removeSpot(csrfToken, targetId) {
+export async function removeSpot(targetId) {
     const formData = new FormData();
-    formData.append('csrf_token', csrfToken);
+    formData.append('csrf_token', getCsrfToken());
     formData.append('id', targetId);
 
     try {

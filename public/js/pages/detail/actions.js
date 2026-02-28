@@ -14,11 +14,11 @@ export async function remove() {
     const result = window.confirm(`このスポット「${spot.name}」を削除してもよろしいですか？\nスポットを削除すると写真や評価データも削除されます。`);
     if (result) {
 
-        const csrfToken = document
-            .querySelector('meta[name="csrf-token"]')
-            ?.getAttribute('content');
+        // const csrfToken = document
+        //     .querySelector('meta[name="csrf-token"]')
+        //     ?.getAttribute('content');
 
-        const resp = await removeSpot(csrfToken, id);
+        const resp = await removeSpot(id);
         if (resp) {
             alert(`スポット「${spot.name}」を削除しました。`);
             window.location.href = `${BASE_PATH}`;
@@ -59,11 +59,11 @@ export async function submitRating() {
     const rating = Number(document.querySelector('input[name="rating"]:checked')?.value ?? 0);
     const comment = document.getElementById('rating-comment').value;
 
-    const csrfToken = document
-        .querySelector('meta[name="csrf-token"]')
-        ?.getAttribute('content');
+    // const csrfToken = document
+    //     .querySelector('meta[name="csrf-token"]')
+    //     ?.getAttribute('content');
 
-    const ret = await saveRating(csrfToken, id, date, rating, comment);
+    const ret = await saveRating(id, date, rating, comment);
     if (!ret) {
         alert("評価の登録に失敗しました。");
         return;

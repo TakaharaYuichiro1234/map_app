@@ -2,11 +2,12 @@
 // 写真(photos)データ管理
 // *****************************
 import { BASE_PATH } from '../config.js';
+import { getCsrfToken } from '../utils/common.js';
 
-export async function savePhotos(csrfToken, spotId, files) {
+export async function savePhotos(spotId, files) {
     for (const file of files) {
         const formData = new FormData();
-        formData.append('csrf_token', csrfToken);
+        formData.append('csrf_token', getCsrfToken());
         formData.append('photo', file);
         formData.append('spot_id', spotId);
 
@@ -94,9 +95,9 @@ export async function getMainPhoto(spotId) {
     }
 }
 
-export async function removePhotoById(csrfToken, targetPhotoId) {
+export async function removePhotoById(targetPhotoId) {
     const formData = new FormData();
-    formData.append('csrf_token', csrfToken);
+    formData.append('csrf_token', getCsrfToken());
     formData.append('id', targetPhotoId);
 
     try {
@@ -126,9 +127,9 @@ export async function removePhotoById(csrfToken, targetPhotoId) {
 }
 
 // このspotIdに登録されている複数の写真の先頭に、targetPhotoIdの写真を移動する
-export async function swapMainPhoto(csrfToken, spotId, targetPhotoId) {
+export async function swapMainPhoto(spotId, targetPhotoId) {
     const formData = new FormData();
-    formData.append('csrf_token', csrfToken);
+    formData.append('csrf_token', getCsrfToken());
     formData.append('id', targetPhotoId);
     formData.append('spot_id', spotId);
 
