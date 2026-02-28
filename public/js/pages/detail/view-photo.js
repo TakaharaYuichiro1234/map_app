@@ -29,20 +29,12 @@ export async function showPhoto() {
 export async function removePhoto() {
     if (!confirm("この写真を削除しますか？")) return;
 
-    // const csrfToken = document
-    //     .querySelector('meta[name="csrf-token"]')
-    //     ?.getAttribute('content');
-
     await removePhotoById(mSelectedPhotoId);
     closePhotoModal();
     await showPhoto();
 }
 
 export async function setMainPhoto() {
-    // const csrfToken = document
-    //     .querySelector('meta[name="csrf-token"]')
-    //     ?.getAttribute('content');
-
     await swapMainPhoto(id, mSelectedPhotoId);
     closePhotoModal();
     await showPhoto();

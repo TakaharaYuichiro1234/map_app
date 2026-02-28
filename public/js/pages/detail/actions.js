@@ -13,11 +13,6 @@ export async function remove() {
     const spot = await getSpotById(id);
     const result = window.confirm(`このスポット「${spot.name}」を削除してもよろしいですか？\nスポットを削除すると写真や評価データも削除されます。`);
     if (result) {
-
-        // const csrfToken = document
-        //     .querySelector('meta[name="csrf-token"]')
-        //     ?.getAttribute('content');
-
         const resp = await removeSpot(id);
         if (resp) {
             alert(`スポット「${spot.name}」を削除しました。`);
@@ -58,10 +53,6 @@ export async function submitRating() {
     // 評価を保存
     const rating = Number(document.querySelector('input[name="rating"]:checked')?.value ?? 0);
     const comment = document.getElementById('rating-comment').value;
-
-    // const csrfToken = document
-    //     .querySelector('meta[name="csrf-token"]')
-    //     ?.getAttribute('content');
 
     const ret = await saveRating(id, date, rating, comment);
     if (!ret) {

@@ -150,52 +150,6 @@ class Photo
         }
     }
 
-    // public function reorder(int $spotId, int $targetPhotoId): array {
-    //     $errors = [];
-    //     try {
-    //         $this->pdo->beginTransaction();
-
-    //         $stmt = $this->pdo->prepare(
-    //             'SELECT id
-    //             FROM photos
-    //             WHERE spot_id = ?
-    //             ORDER BY sort_order ASC, created_at ASC'
-    //         );
-
-    //         $stmt->execute([$spotId]);
-    //         $srcPhotos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    //         $srcPhotoIds = array_column($srcPhotos, 'id');
-
-    //         $target = array_search($targetPhotoId, $srcPhotoIds);   
-    //         if (!$target) {
-    //             $errors[] = '写真が存在しない';
-    //             return $errors;
-    //         }
-
-    //         $dstPhotoIds[] = $targetPhotoId;
-    //         foreach ($srcPhotoIds as $photoId) {
-    //             if ($photoId === $targetPhotoId) continue;
-    //             $dstPhotoIds[] = $photoId;
-    //         }
-
-    //         foreach ($dstPhotoIds as $index => $photoId) {
-    //             $stmt = $this->pdo->prepare(
-    //                 'UPDATE photos SET sort_order = ? WHERE id = ?'
-    //             );
-    //             $stmt->execute([$index, $photoId]);
-    //         }
-
-    //         $this->pdo->commit();
-    //         return $errors;
-
-    //     } catch (\Throwable $e) {
-    //         $this->pdo->rollBack();
-    //         // throw $e;
-    //         $errors[] = $e->getMessage();
-    //         return $errors;
-    //     }
-    // }
     public function reorder(int $spotId, int $targetPhotoId): array
     {
         $errors = [];

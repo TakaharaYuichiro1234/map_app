@@ -96,10 +96,6 @@ export async function initViewHistory() {
         removeBtn.addEventListener('click', async () => {
             if (!confirm('この評価を削除してもよろしいですか？')) return;
 
-            // const csrfToken = document
-            //     .querySelector('meta[name="csrf-token"]')
-            //     ?.getAttribute('content');
-
             const success = await removeRating(r.id);
             if (!success) {
                 alert('削除に失敗しました。');

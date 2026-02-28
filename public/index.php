@@ -50,7 +50,6 @@ $router->add('POST', '/api/spots/store', SpotApiController::class, 'store', [Use
 $router->add('POST', '/api/spots/delete', SpotApiController::class, 'destroy', [UserMiddleware::class, CsrfMiddleware::class]);
 $router->add('POST', '/api/spots/update', SpotApiController::class, 'update', [UserMiddleware::class, CsrfMiddleware::class]);
 
-// $router->add('GET', '/api/ratings/get_by_spot_id/{spot_id}', RatingApiController::class, 'getBySpotId');
 $router->add('GET', '/api/ratings', RatingApiController::class, 'index');
 $router->add('POST', '/api/ratings/store', RatingApiController::class, 'store', [UserMiddleware::class, CsrfMiddleware::class]);
 $router->add('POST', '/api/ratings/delete', RatingApiController::class, 'destroy', [UserMiddleware::class, CsrfMiddleware::class]);

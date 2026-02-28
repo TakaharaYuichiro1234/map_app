@@ -15,7 +15,6 @@ class Spot
 
     public function findAll(): array
     {
-        // $sql = 'SELECT * FROM spots';
         $sql = 'SELECT s.id, s.name, description, lat, lng, address, u.uuid as owner_uuid, s.created_at, s.updated_at 
                 FROM spots s 
                 LEFT JOIN users u 

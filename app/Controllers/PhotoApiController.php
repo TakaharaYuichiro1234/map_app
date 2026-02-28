@@ -47,7 +47,6 @@ class PhotoApiController extends BaseApiController
         ]);
     }
 
-
     public function store()
     {
         try {

@@ -22,35 +22,10 @@ class RatingApiController extends BaseApiController
         $this->userModel = new User($this->pdo);
     }
 
-    // public function index()
-    // {
-    //     try {
-    //         $ratings =  $this->ratingModel->all();
-    //         $this->jsonResponse([
-    //             'success' => true,
-    //             'ratings' => $ratings,
-    //             'errors' => [],
-    //         ]);
-    //     } catch (\Throwable $e) {
-    //         $this->jsonResponse([
-    //             'success' => false,
-    //             'errors'  => ['データベースエラー'],
-    //         ], 400);
-    //     }
-    // }
-
     public function index()
     {
         $spotId = $_GET['spot_id'] ?? null;
         $uuid   = $_GET['uuid'] ?? null;
-
-        // $ratings = $this->ratingModel->find($spotId, $uuid);
-
-        // return $this->json([
-        //     'success' => true,
-        //     'ratings' => $ratings
-        // ]);
-
 
         try {
             $ratings =  $this->ratingModel->find($spotId, $uuid);
@@ -117,22 +92,6 @@ class RatingApiController extends BaseApiController
             ], 400);
         }
     }
-
-    // public function update() {
-    //     try {
-    //         $ratingId = $this->ratingModel->update($_POST);
-    //         $this->jsonResponse([
-    //             'success' => true,
-    //             'errors' => [],
-    //         ]);
-
-    //     } catch (\Throwable $e) {
-    //         $this->jsonResponse([
-    //             'success' => false,
-    //             'errors'  => ['書き込みエラー'],
-    //         ], 400);
-    //     }
-    // }
 
     public function destroy()
     {

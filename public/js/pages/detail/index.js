@@ -27,8 +27,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 // 初期設定用の関数
 // -----------------------------
 async function init() {
-    // const match = window.location.pathname.match(/\/spots\/(\d+)/);
-    // const id = match ? match[1] : null;
     const spot = await getSpotById(id);
     const isOwner = user ? (spot.ownerUuid === user['uuid']) : false;
 
@@ -69,9 +67,6 @@ async function initPhotoProcess(isOwner) {
         fileInputElementId,
         (e) => handlePhotoSelect(e, {
             onEach: async (img) => {
-                // const csrfToken = document
-                //     .querySelector('meta[name="csrf-token"]')
-                //     ?.getAttribute('content');
                 const ret = await savePhotos(id, [img]);
                 if (!ret) return false;
                 return true;
@@ -159,9 +154,6 @@ function updateSpotField({
         return false;
     }
 
-    // const csrfToken = document
-    //     .querySelector('meta[name="csrf-token"]')
-    //     ?.getAttribute('content');
     const resp = updateSpot(spotId, { [fieldName]: value });
     if (!resp) {
         alert("データの更新に失敗しました");

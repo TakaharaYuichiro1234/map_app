@@ -86,7 +86,6 @@ function initMapBlock(spot) {
     detailMap.init();
 
     // このスポットの位置にマーカーを表示
-    // const spot = getSpotById(id);
     detailMap.setMarker(spot.lat, spot.lng);
 
     // 現在地をイベントで取得して、スポットとの距離に関するコメントを表示

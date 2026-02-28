@@ -245,20 +245,6 @@ export class MapModule {
         this.ctx = this.canvas.getContext("2d");
     }
 
-    // loadSpotData() {
-    //     this.spots = loadSpots();
-    // }
-
-    // getHighlightFromUrl() {
-    //     const params = new URLSearchParams(location.search);
-    //     const id = params.get("highlight");
-    //     if (id) {
-    //         this.highlightSpotId = id;
-    //         this.highlightStartTime = performance.now();
-    //         this.moveToHilightSpotFlag = true;
-    //     }
-    // }
-
     // -----------------------------
     // 3D棒グラフ描画
     // -----------------------------
@@ -377,18 +363,13 @@ export class MapModule {
 
             const p = this.map.latLngToContainerPoint([spot.lat, spot.lng]);
 
-
             // バーの高さレベル(1〜5)
             const maxH = latestRating > 0 ? latestRating : 1;
             const minH = pastRating > 0 ? pastRating : 1;
             const levelH = (maxH - minH) * this.animationProgress + minH;
 
-
-
             // バーの底面サイズレベル(1〜2: ユーザー数1のとき1、5のとき2)
             const levelA = Math.max(1.0, Math.min(2.0, 1.0 + (users - 1) / 4));
-
-
 
             // 遠近投影計算
             const { basePoints, topPoints, hitPoints } = this.projectBox(levelH, levelA, p);

@@ -115,7 +115,6 @@ export async function removePhotoById(targetPhotoId) {
 
         const result = await res.json();
 
-
         if (!result.success) throw new Error('データベースエラー');
         return true;
 
@@ -123,7 +122,6 @@ export async function removePhotoById(targetPhotoId) {
         console.error(err);
         return false;
     }
-
 }
 
 // このspotIdに登録されている複数の写真の先頭に、targetPhotoIdの写真を移動する

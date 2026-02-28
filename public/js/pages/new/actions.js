@@ -68,10 +68,6 @@ export async function registerSpot() {
         return;
     }
 
-    // const csrfToken = document
-    //     .querySelector('meta[name="csrf-token"]')
-    //     ?.getAttribute('content');
-
     const newSpotId = await saveSpot(spotName, description, newSpotPos.lat, newSpotPos.lng, address);
     if (newSpotId < 0) {
         alert("スポットの登録に失敗しました。");

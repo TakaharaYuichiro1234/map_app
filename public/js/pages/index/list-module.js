@@ -57,7 +57,6 @@ export class ListModule {
     }
 
     getSpots(isOnlyNear, currentPosition) {
-        // let spots = this.spots;
         let spots = this.spots.map(s => ({ ...s }));     // ディープコピー
 
         // 「近くのスポット」が選択されていた場合、スポットデータに距離を追加
@@ -183,5 +182,4 @@ export class ListModule {
 
         this.listDom.appendChild(div);
     }
-
 };

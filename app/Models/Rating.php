@@ -15,7 +15,6 @@ class Rating
 
     public function all(): array
     {
-        // $sql = 'SELECT * FROM ratings';
         $sql =
             'SELECT r.id, r.spot_id, u.uuid, r.date, r.rating, r.comment, r.created_at, r.updated_at 
              FROM ratings r 
@@ -27,7 +26,6 @@ class Rating
 
     public function find($spotId = null, $uuid = null)
     {
-        // $sql = "SELECT * FROM ratings WHERE 1=1";
         $sql =
             'SELECT r.id, r.spot_id, u.uuid, r.date, r.rating, r.comment, r.created_at, r.updated_at 
              FROM ratings r 
@@ -54,9 +52,6 @@ class Rating
 
     public function findById($id): ?array
     {
-        // $stmt = $this->pdo->prepare(
-        //     'SELECT * FROM ratings WHERE id = ? LIMIT 1'
-        // );
         $stmt = $this->pdo->prepare(
             'SELECT r.id, spot_id, uuid, date, rating, comment, r.created_at, r.updated_at 
              FROM ratings r 
@@ -70,9 +65,6 @@ class Rating
         return $rating ?: null;
     }
 
-
-
-    // spotId, userId, rating, comment, createdAt
     public function insert(array $data): int
     {
         $stmt = $this->pdo->prepare(
@@ -81,14 +73,6 @@ class Rating
         $stmt->execute([$data['spot_id'], $data['user_id'], $data['date'], $data['rating'], $data['comment']]);
 
         return (int)$this->pdo->lastInsertId();
-    }
-
-    public function update(int $id, array $data): void
-    {
-        // $stmt = $this->pdo->prepare(
-        //     'UPDATE stocks SET name = ?, digit = ?, updated_at = NOW() WHERE id = ?'
-        // );
-        // $stmt->execute([$data['name'], (int)$data['digit'], $id]);
     }
 
     public function delete(int $id, int $userId): void

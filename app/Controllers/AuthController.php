@@ -34,9 +34,6 @@ class AuthController extends BaseWebController
             exit;
         }
 
-        // require __DIR__ . '/../../config/db.php';
-        // $this->pdo = $pdo;
-
         $stmt = $this->pdo->prepare(
             'SELECT * FROM users WHERE email = ?'
         );

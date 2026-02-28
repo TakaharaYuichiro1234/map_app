@@ -2,19 +2,12 @@
 
 namespace App\Controllers;
 
-use PDO;
 use App\Core\Auth;
 use App\Core\BaseWebController;
 
 class SpotController extends BaseWebController
 {
-    private PDO $pdo;
-
-    public function __construct()
-    {
-        require __DIR__ . '/../../config/db.php';
-        $this->pdo = $pdo;
-    }
+    public function __construct() {}
 
     public function index()
     {

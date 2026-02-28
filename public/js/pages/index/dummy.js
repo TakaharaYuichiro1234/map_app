@@ -22,7 +22,6 @@ export async function createDummySpots() {
     const bounds = mapInstance.getMapBounds();
     const rangeLat = bounds.getNorthEast().lat - bounds.getSouthWest().lat;
     const rangeLng = bounds.getNorthEast().lng - bounds.getSouthWest().lng;
-    // const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
     const currentUserUuid = user['uuid'];
     const allUsers = await getUsers();
     const userUuidAll = allUsers.map(u => u.uuid);
