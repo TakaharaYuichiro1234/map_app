@@ -2,7 +2,7 @@
 
 session_name('MAP_APP_SESSID');
 session_set_cookie_params([
-    'secure' => true,      // 本番HTTPSで有効
+    'secure' => false,     
     'httponly' => true,
     'samesite' => 'Lax'
 ]);
